@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import { setAccessToken, clearAccessToken } from '../services/axiosInstance';
 import { authAPI } from '../services/api';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
 let socketInstance = null;
 
 const connectSocket = (userId, onNotification, onBookingUpdated) => {
