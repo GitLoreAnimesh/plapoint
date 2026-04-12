@@ -15,10 +15,15 @@ const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 // ── Setup ──────────────────────────────────────────────
+// Sanitize CLIENT_URL — strips hidden chars/quotes that cause ERR_INVALID_CHAR
+const CLIENT_URL = (process.env.CLIENT_URL || 'http://localhost:3000')
+  .trim()
+  .replace(/^["']|["']$/g, ''); // remove surrounding quotes if accidentally added
+
 const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server, {
-  cors: { origin: process.env.CLIENT_URL || 'http://localhost:3000', credentials: true },
+  cors: { origin: CLIENT_URL, credentials: true },
 });
 
 // Ensure directories exist
@@ -29,7 +34,7 @@ const io     = new Server(server, {
 // ── Middleware ─────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
-  origin:      process.env.CLIENT_URL || 'http://localhost:3000',
+  origin:      CLIENT_URL,
   credentials: true,
   methods:     ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
 }));
