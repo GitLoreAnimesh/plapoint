@@ -62,6 +62,9 @@ app.use('/api/admin',         require('./routes/admin'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/payment',       require('./routes/payment'));
 
+// Root health check (for Render's default health ping)
+app.get('/', (_, res) => res.json({ status: 'ok', message: 'PlayPoint API is running.' }));
+
 // Health check
 app.get('/api/health', (_, res) => res.json({ ok: true, time: new Date(), env: process.env.NODE_ENV }));
 
