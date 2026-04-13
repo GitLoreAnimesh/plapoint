@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { groundAPI, bookingAPI, paymentAPI } from '../services/api';
+import { groundAPI, bookingAPI, paymentAPI, IMAGE_BASE_URL } from '../services/api';
 import useAuth from '../store/authStore';
 import { C, SYNE, MONO, Spinner, Alert, Btn, Modal, SPORT_EMOJI } from '../components/ui';
 
@@ -102,7 +102,7 @@ export default function GroundDetailPage() {
   const [imgIdx,   setImgIdx]   = useState(0);
 
   const [bookModal,   setBookModal]   = useState(null);
-  const [payMode,     setPayMode]     = useState('pay_at_venue');
+  // Removed payMode state as flow is strictly defined by adv.enabled
   const [submitting,  setSubmitting]  = useState(false);
   const [bookError,   setBookError]   = useState('');
   const [redirecting, setRedirecting] = useState(false);
@@ -144,22 +144,11 @@ export default function GroundDetailPage() {
       const res = await bookingAPI.create({
         groundId: id, date,
         startHour: slot.startHour, endHour: slot.endHour,
-        paymentMode: payMode,
+        paymentMode: 'pay_at_venue',
       });
       const booking = res.data.booking;
 
-      if (payMode === 'sslcommerz') {
-        setSubmitting(false);
-        setRedirecting(true);
-        setBookModal(null);
-        try {
-          const payRes = await paymentAPI.initiate(booking._id);
-          window.location.href = payRes.data.gatewayUrl;
-        } catch (err) {
-          setRedirecting(false);
-          toast.error(err.response?.data?.error || 'Could not connect to payment gateway.');
-        }
-      } else if (adv?.enabled) {
+      if (adv?.enabled) {
         // pay_at_venue but advance required — redirect player to pay advance
         setBookModal(null);
         setSubmitting(false);
@@ -201,7 +190,7 @@ export default function GroundDetailPage() {
           {/* Gallery */}
           <div style={{ borderRadius: 14, overflow: 'hidden', marginBottom: 22, position: 'relative', height: 290, background: C.card }}>
             {imgs.length > 0
-              ? <img src={'http://localhost:5000' + imgs[imgIdx]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={IMAGE_BASE_URL + imgs[imgIdx]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 80 }}>{SPORT_EMOJI[ground.sport] || '🏟️'}</div>}
             {imgs.length > 1 && (
               <div style={{ position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 5 }}>
@@ -289,34 +278,7 @@ export default function GroundDetailPage() {
               style={{ width: '100%', padding: '10px 14px', background: '#fff', border: '1px solid ' + C.border, borderRadius: 8, color: '#111', fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: 'none', boxSizing: 'border-box', cursor: 'pointer' }} />
           </div>
 
-          {/* Payment mode — only show if no advance required */}
-          {!adv?.enabled && (
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: C.muted, textTransform: 'uppercase', letterSpacing: .5, marginBottom: 5 }}>Payment Method</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                <button onClick={() => setPayMode('pay_at_venue')} style={{
-                  padding: '10px 12px', borderRadius: 8, textAlign: 'left',
-                  border: '1.5px solid ' + (payMode === 'pay_at_venue' ? C.lime : C.border),
-                  background: payMode === 'pay_at_venue' ? 'rgba(200,245,0,.07)' : 'transparent',
-                  color: payMode === 'pay_at_venue' ? C.lime : C.muted,
-                  cursor: 'pointer', fontFamily: "'DM Sans',sans-serif",
-                }}>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>💵 Pay at Venue</div>
-                  <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Pay cash when you arrive</div>
-                </button>
-                <button onClick={() => setPayMode('sslcommerz')} style={{
-                  padding: '10px 12px', borderRadius: 8, textAlign: 'left',
-                  border: '1.5px solid ' + (payMode === 'sslcommerz' ? '#3B82F6' : C.border),
-                  background: payMode === 'sslcommerz' ? 'rgba(59,130,246,.07)' : 'transparent',
-                  color: payMode === 'sslcommerz' ? '#93C5FD' : C.muted,
-                  cursor: 'pointer', fontFamily: "'DM Sans',sans-serif",
-                }}>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>🔒 Pay Online — SSLCommerz</div>
-                  <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>bKash · Nagad · Rocket · VISA · Mastercard</div>
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Payment Method UI removed. It strictly relies on advancePayment.enabled */}
 
           {/* Slots */}
           <div>
@@ -342,7 +304,7 @@ export default function GroundDetailPage() {
               ['Ground',  ground.name],
               ['Date',    new Date(date).toLocaleDateString('en-BD', { weekday: 'short', day: 'numeric', month: 'short' })],
               ['Slot',    bookModal.startHour + ':00 – ' + bookModal.endHour + ':00'],
-              ['Payment', adv?.enabled ? 'Advance via SSLCommerz' : payMode === 'sslcommerz' ? 'SSLCommerz Online' : 'Pay at Venue'],
+              ['Payment', adv?.enabled ? 'Advance via SSLCommerz' : 'Pay at Venue'],
             ].map(([k, v]) => (
               <div key={k} style={{ background: '#141414', borderRadius: 8, padding: '9px 12px' }}>
                 <div style={{ fontSize: 10, color: C.muted, textTransform: 'uppercase', letterSpacing: .5, marginBottom: 2 }}>{k}</div>
@@ -356,15 +318,7 @@ export default function GroundDetailPage() {
             <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: C.lime }}>৳{bookModal.price}</span>
           </div>
 
-          {/* Gateway info banner */}
-          {payMode === 'sslcommerz' && !adv?.enabled && (
-            <div style={{ marginBottom: 14, padding: 12, background: 'rgba(59,130,246,.06)', border: '1px solid rgba(59,130,246,.25)', borderRadius: 10 }}>
-              <div style={{ fontWeight: 700, fontSize: 13, color: '#60A5FA', marginBottom: 6 }}>🔒 Secure Online — SSLCommerz</div>
-              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
-                You will be redirected to a SSLCommerz — Bangladesh's trusted payment gateway. Supports bKash, Nagad, Rocket, VISA & Mastercard. Your booking confirms automatically on successful payment.
-              </div>
-            </div>
-          )}
+          {/* Gateway info banner removed */}
 
           {/* Advance payment info */}
           {adv?.enabled && (
@@ -383,9 +337,7 @@ export default function GroundDetailPage() {
                 ? 'Processing…'
                 : adv?.enabled
                   ? '⚡ Book & Pay Advance ৳' + adv.amount
-                  : payMode === 'sslcommerz'
-                    ? '💳 Pay ৳' + bookModal.price + ' Online'
-                    : '✓ Confirm Booking'}
+                  : '✓ Confirm Booking'}
             </Btn>
             <Btn variant="ghost" onClick={() => { setBookModal(null); setBookError(''); }}>Back</Btn>
           </div>

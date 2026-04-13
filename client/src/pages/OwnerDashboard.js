@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { ownerAPI, groundAPI } from '../services/api';
+import { ownerAPI, groundAPI, IMAGE_BASE_URL } from '../services/api';
 import { C, SYNE, MONO, Badge, Btn, Spinner, Alert } from '../components/ui';
 import useAuth, { subscribeToBookingUpdates } from '../store/authStore';
 import toast from 'react-hot-toast';
@@ -349,7 +349,7 @@ function MyGrounds() {
               {g.images?.length > 0 && (
                 <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:12 }}>
                   {g.images.slice(0,4).map((img,i)=>(
-                    <img key={i} src={img} alt="" style={{ width:64, height:48, objectFit:'cover', borderRadius:6, border:`1px solid ${C.border}` }} />
+                    <img key={i} src={`${IMAGE_BASE_URL}${img}`} alt="" style={{ width:64, height:48, objectFit:'cover', borderRadius:6, border:`1px solid ${C.border}` }} />
                   ))}
                   {g.images.length>4 && <div style={{ width:64, height:48, borderRadius:6, border:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'center', color:C.muted, fontSize:12 }}>+{g.images.length-4}</div>}
                 </div>
@@ -403,7 +403,7 @@ function MyGrounds() {
               <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, marginBottom:16 }}>
                 {(imgModal.images||[]).map((img,i)=>(
                   <div key={i} style={{ position:'relative', borderRadius:8, overflow:'hidden', border:`1px solid ${C.border}` }}>
-                    <img src={img} alt="" style={{ width:'100%', height:100, objectFit:'cover', display:'block' }} />
+                    <img src={`${IMAGE_BASE_URL}${img}`} alt="" style={{ width:'100%', height:100, objectFit:'cover', display:'block' }} />
                     <button
                       onClick={()=>removeImage(imgModal._id, img)}
                       style={{ position:'absolute', top:4, right:4, background:'rgba(239,68,68,.9)', border:'none', borderRadius:4, color:'#fff', fontSize:11, padding:'2px 7px', cursor:'pointer', fontWeight:700 }}

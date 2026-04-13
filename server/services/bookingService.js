@@ -39,11 +39,11 @@ const createBooking = async (playerId, playerName, body, io) => {
   const d      = new Date(date); d.setHours(0, 0, 0, 0);
 
   const safeMode          = paymentMode === 'sslcommerz' ? 'sslcommerz' : 'pay_at_venue';
-  const initPaymentStatus = safeMode === 'sslcommerz' ? 'pending' : 'unpaid';
-  const initStatus        = safeMode === 'sslcommerz' ? 'pending_payment' : 'pending';
+  const advConf           = ground.advancePayment;
+  const advRequired       = advConf?.enabled && safeMode !== 'sslcommerz';
 
-  const advConf    = ground.advancePayment;
-  const advRequired = advConf?.enabled && safeMode !== 'sslcommerz';
+  const initPaymentStatus = safeMode === 'sslcommerz' ? 'pending' : 'unpaid';
+  const initStatus        = (safeMode === 'sslcommerz' || advRequired) ? 'pending_payment' : 'pending';
 
   const booking = await Booking.create({
     player:        playerId,

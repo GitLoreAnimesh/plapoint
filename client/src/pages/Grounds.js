@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { groundAPI } from '../services/api';
+import { groundAPI, IMAGE_BASE_URL } from '../services/api';
 import { C, SYNE, Spinner, SPORT_EMOJI } from '../components/ui';
 
 const SPORTS = ['badminton','futsal','basketball','tennis','volleyball'];
@@ -14,7 +14,7 @@ function GroundCard({ g }) {
         onMouseEnter={e => { e.currentTarget.style.borderColor = C.lime; e.currentTarget.style.transform = 'translateY(-2px)'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'none'; }}>
         {/* Image */}
-        <div style={{ height:160, background: img ? `url(http://localhost:5000${img}) center/cover` : 'linear-gradient(135deg, #1a1a1a 0%, #242424 100%)', position:'relative' }}>
+        <div style={{ height:160, background: img ? `url(${IMAGE_BASE_URL}${img}) center/cover` : 'linear-gradient(135deg, #1a1a1a 0%, #242424 100%)', position:'relative' }}>
           {!img && <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:52 }}>{SPORT_EMOJI[g.sport] || '🏟️'}</div>}
           <div style={{ position:'absolute', top:10, left:10, background:'rgba(13,13,13,.85)', borderRadius:100, padding:'3px 10px', fontSize:11, fontWeight:700, color:C.lime, textTransform:'capitalize' }}>
             {SPORT_EMOJI[g.sport]} {g.sport}
