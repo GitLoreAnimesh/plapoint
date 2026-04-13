@@ -257,6 +257,9 @@ const handleFail = async (body) => {
   if (payType === 'advance') {
     booking.advancePayment.status = 'failed';
     booking.advancePayment.ipnRaw = body;
+    booking.status                = 'cancelled';
+    booking.cancelledBy           = 'system';
+    booking.cancelReason          = 'Advance payment failed at gateway';
   } else {
     booking.paymentStatus    = 'failed';
     booking.status           = 'cancelled';
@@ -282,6 +285,9 @@ const handleCancel = async (body) => {
   if (payType === 'advance') {
     booking.advancePayment.status = 'failed';
     booking.advancePayment.ipnRaw = body;
+    booking.status                = 'cancelled';
+    booking.cancelledBy           = 'player';
+    booking.cancelReason          = 'Advance payment cancelled by player';
   } else {
     booking.paymentStatus    = 'cancelled';
     booking.status           = 'cancelled';
