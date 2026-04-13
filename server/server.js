@@ -15,10 +15,11 @@ const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 // ── Setup ──────────────────────────────────────────────
-// Sanitize CLIENT_URL — strips hidden chars/quotes that cause ERR_INVALID_CHAR
+// Sanitize CLIENT_URL — handle single OR multiple comma-separated URLs
 const CLIENT_URL = (process.env.CLIENT_URL || 'http://localhost:3000')
-  .trim()
-  .replace(/^["']|["']$/g, ''); // remove surrounding quotes if accidentally added
+  .split(',')
+  .map(url => url.trim().replace(/^["']|["']$/g, ''))
+  .filter(Boolean);
 
 const app    = express();
 const server = http.createServer(app);
