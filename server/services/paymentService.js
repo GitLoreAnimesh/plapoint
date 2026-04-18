@@ -169,7 +169,7 @@ const handleSuccess = async (body, io) => {
 
   if (!tran_id || !bookingId) throw new AppError('Invalid callback.', 400);
 
-  const booking = await Booking.findById(bookingId);
+  const booking = await Booking.findById(bookingId).populate('ground', 'name city owner').populate('player', 'name');
   if (!booking) throw new AppError('Booking not found.', 404);
 
   // Validate with SSLCommerz
@@ -206,9 +206,16 @@ const handleSuccess = async (body, io) => {
     booking.status                  = 'confirmed';
     await booking.save();
 
-    await push(io, booking.player, 'advance_paid', 'Advance Payment Confirmed!',
+    await push(io, booking.player._id, 'advance_paid', 'Advance Payment Confirmed!',
       `Your advance of ৳${paidAmount} for ${booking.groundName} is confirmed. Booking active!`,
       { bookingId: booking._id });
+
+    if (booking.ground?.owner) {
+      await push(io, booking.ground.owner, 'advance_paid', 'Advance Received',
+        `${booking.player?.name || 'A player'} paid ৳${paidAmount} advance for ${booking.groundName}.`,
+        { bookingId: booking._id });
+      io.to('user_' + booking.ground.owner.toString()).emit('bookingUpdated', booking);
+    }
 
     logger.info(`Advance paid | booking:${bookingId} | val_id:${val_id}`);
     return { booking, cb: cb || clientBase(), payType: 'advance' };
@@ -235,9 +242,16 @@ const handleSuccess = async (body, io) => {
     booking.sslPayment.ipnRaw     = body;
     await booking.save();
 
-    await push(io, booking.player, 'payment_success', 'Payment Received!',
+    await push(io, booking.player._id, 'payment_success', 'Payment Received!',
       `Your payment of ৳${paidAmount} for ${booking.groundName} on ${new Date(booking.date).toDateString()} at ${booking.startHour}:00 has been received. Awaiting owner confirmation.`,
       { bookingId: booking._id });
+
+    if (booking.ground?.owner) {
+      await push(io, booking.ground.owner, 'payment_success', 'Full Payment Received',
+        `${booking.player?.name || 'A player'} paid ৳${paidAmount} for ${booking.groundName}.`,
+        { bookingId: booking._id });
+      io.to('user_' + booking.ground.owner.toString()).emit('bookingUpdated', booking);
+    }
 
     logger.info(`Full payment received | booking:${bookingId} | val_id:${val_id}`);
     return { booking, cb: cb || clientBase(), payType: 'full' };

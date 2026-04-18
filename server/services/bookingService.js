@@ -173,15 +173,16 @@ const addReview = async (bookingId, playerId, { rating, comment }) => {
 // ─────────────────────────────────────────────────────
 // getOwnerBookings
 // ─────────────────────────────────────────────────────
-const getOwnerBookings = async (ownerId, { status, page = 1, limit = 20 } = {}) => {
+const getOwnerBookings = async (ownerId, { status, date, page = 1, limit = 20 } = {}) => {
   const groundIds = (await Ground.find({ owner: ownerId }).select('_id')).map(g => g._id);
   const filter = { ground: { $in: groundIds } };
   if (status) filter.status = status;
+  if (date) filter.date = new Date(date);
   const [bookings, total] = await Promise.all([
     Booking.find(filter)
       .populate('player', 'name email phone address')
       .populate('ground', 'name city')
-      .sort({ date: -1 })
+      .sort({ createdAt: -1 })
       .skip((+page - 1) * +limit)
       .limit(+limit),
     Booking.countDocuments(filter),
@@ -256,7 +257,6 @@ const updateBookingStatus = async (bookingId, ownerId, { status: toStatus, reaso
     confirmed: ['Booking Confirmed', `Your booking at ${b.groundName} on ${new Date(b.date).toDateString()} at ${b.startHour}:00 is confirmed!`],
     cancelled: ['Booking Cancelled by Owner', `Your booking at ${b.groundName} was cancelled. Reason: ${reason || 'No reason provided'}`],
     completed: ['Session Completed', `Your session at ${b.groundName} is complete. Leave a review!`],
-    no_show:   ['Marked as No-Show', `You were marked as no-show for ${b.groundName} on ${new Date(b.date).toDateString()}`],
   };
   const [title, message] = messages[toStatus] || [];
   if (title) await push(io, b.player, `booking_${toStatus}`, title, message, { bookingId: b._id });

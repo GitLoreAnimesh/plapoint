@@ -92,27 +92,30 @@ function BookingsManager() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
   const [processing, setProcessing] = useState(null); // bookingId currently being acted on
   const filterRef = React.useRef('');
+  const dateFilterRef = React.useRef('');
 
-  const load = (s='') => {
+  const load = (s='', d='') => {
     filterRef.current = s;
+    dateFilterRef.current = d;
     setLoading(true);
-    ownerAPI.getBookings({ status:s||undefined })
+    ownerAPI.getBookings({ status:s||undefined, date:d||undefined })
       .then(r => { setBookings(r.data.bookings||[]); setLoading(false); })
       .catch(() => setLoading(false));
   };
 
   // ── Real-time sync via Socket.IO ──────────────────────
   useEffect(() => {
-    load();
+    load(filter, dateFilter);
     const unsubscribe = subscribeToBookingUpdates((payload) => {
       // Update the matching booking in local state instantly — no refetch needed.
       setBookings(prev => {
         const idx = prev.findIndex(b => b._id === payload.bookingId);
         if (idx === -1) {
           // New booking appeared for this owner (e.g. just created) — refetch
-          load(filterRef.current);
+          load(filterRef.current, dateFilterRef.current);
           return prev;
         }
         const updated = [...prev];
@@ -147,7 +150,7 @@ function BookingsManager() {
       toast.error(errMsg);
       // If it was a conflict (409) the booking state changed under us — refetch
       if (err.response?.status === 409) {
-        load(filterRef.current);
+        load(filterRef.current, dateFilterRef.current);
       }
     } finally {
       setProcessing(null);
@@ -159,8 +162,16 @@ function BookingsManager() {
       <h1 style={{ fontFamily:SYNE, fontSize:26, fontWeight:800, marginBottom:24, marginTop:0 }}>Booking Manager</h1>
       <div style={{ display:'flex', gap:8, marginBottom:20 }}>
         {[['','All'],['pending','Pending'],['confirmed','Confirmed'],['completed','Completed'],['cancelled','Cancelled']].map(([v,l])=>(
-          <button key={v} onClick={()=>{setFilter(v);load(v);}} style={{ padding:'6px 16px', borderRadius:8, border:`1px solid ${filter===v?C.lime:C.border}`, background:filter===v?'rgba(200,245,0,.07)':'transparent', color:filter===v?C.lime:C.muted, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>{l}</button>
+          <button key={v} onClick={()=>{setFilter(v);load(v, dateFilterRef.current);}} style={{ padding:'6px 16px', borderRadius:8, border:`1px solid ${filter===v?C.lime:C.border}`, background:filter===v?'rgba(200,245,0,.07)':'transparent', color:filter===v?C.lime:C.muted, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>{l}</button>
         ))}
+        {/* Date Filter */}
+        <input 
+          type="date"
+          value={dateFilter}
+          onChange={e => { setDateFilter(e.target.value); load(filter, e.target.value); }}
+          style={{ padding:'6px 12px', borderRadius:8, border:`1px solid ${dateFilter?C.lime:C.border}`, background:dateFilter?'rgba(200,245,0,.07)':'transparent', color:dateFilter?C.lime:C.muted, fontSize:12, fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer' }}
+        />
+        {dateFilter && <button onClick={()=>{setDateFilter(''); load(filter, '');}} style={{ padding:'6px 12px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', color:C.muted, fontSize:12, cursor:'pointer' }}>x Clear Date</button>}
       </div>
       {loading ? <Spinner /> : (
         <div style={{ background:'#111', border:`1px solid ${C.border}`, borderRadius:12, overflow:'hidden' }}>
@@ -209,7 +220,6 @@ function BookingsManager() {
                         {b.status==='confirmed' && (
                           <>
                             <Btn size="sm" variant="success" disabled={!!processing} onClick={()=>update(b._id,'completed')}>Complete</Btn>
-                            <Btn size="sm" variant="ghost" disabled={!!processing} onClick={()=>update(b._id,'no_show')}>No Show</Btn>
                             <Btn size="sm" variant="danger" disabled={!!processing} onClick={()=>{const r=window.prompt('Cancellation reason:');if(r!==null)update(b._id,'cancelled',r||'Cancelled by owner');}}>Cancel</Btn>
                           </>
                         )}
