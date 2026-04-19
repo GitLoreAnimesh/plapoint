@@ -161,7 +161,7 @@ function BookingsManager() {
     <div>
       <h1 style={{ fontFamily:SYNE, fontSize:26, fontWeight:800, marginBottom:24, marginTop:0 }}>Booking Manager</h1>
       <div style={{ display:'flex', gap:8, marginBottom:20 }}>
-        {[['','All'],['pending','Pending'],['confirmed','Confirmed'],['completed','Completed'],['cancelled','Cancelled']].map(([v,l])=>(
+        {[['','All'],['pending_payment','Awaiting Pay'],['pending','Pending'],['confirmed','Confirmed'],['completed','Completed'],['cancelled','Cancelled']].map(([v,l])=>(
           <button key={v} onClick={()=>{setFilter(v);load(v, dateFilterRef.current);}} style={{ padding:'6px 16px', borderRadius:8, border:`1px solid ${filter===v?C.lime:C.border}`, background:filter===v?'rgba(200,245,0,.07)':'transparent', color:filter===v?C.lime:C.muted, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>{l}</button>
         ))}
         {/* Date Filter */}

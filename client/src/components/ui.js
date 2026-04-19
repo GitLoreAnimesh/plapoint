@@ -18,11 +18,11 @@ export const C = {
 
 export const SPORT_EMOJI = { badminton:'🏸', futsal:'⚽', basketball:'🏀', tennis:'🎾', volleyball:'🏐' };
 export const STATUS_CFG  = {
-  pending:   { color:'#F59E0B', bg:'rgba(245,158,11,.12)',  label:'Pending'   },
+  pending_payment: { color:'#F59E0B', bg:'rgba(245,158,11,.12)', label:'Awaiting Payment' },
+  pending:   { color:'#3B82F6', bg:'rgba(59,130,246,.12)',  label:'Pending'   },
   confirmed: { color:'#22C55E', bg:'rgba(34,197,94,.12)',   label:'Confirmed' },
   cancelled: { color:'#EF4444', bg:'rgba(239,68,68,.12)',   label:'Cancelled' },
-  completed: { color:'#3B82F6', bg:'rgba(59,130,246,.12)',  label:'Completed' },
-  no_show:   { color:'#6B7280', bg:'rgba(107,114,128,.12)', label:'No Show'   },
+  completed: { color:'#8B5CF6', bg:'rgba(139,92,246,.12)',  label:'Completed' },
 };
 
 // ── Typography ──────────────────────────────────────────

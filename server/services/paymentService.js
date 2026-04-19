@@ -214,7 +214,13 @@ const handleSuccess = async (body, io) => {
       await push(io, booking.ground.owner, 'advance_paid', 'Advance Received',
         `${booking.player?.name || 'A player'} paid ৳${paidAmount} advance for ${booking.groundName}.`,
         { bookingId: booking._id });
-      io.to('user_' + booking.ground.owner.toString()).emit('bookingUpdated', booking);
+      const advPayload = {
+        bookingId: booking._id.toString(),
+        status:    booking.status,
+        groundId:  booking.ground._id?.toString() || booking.ground.toString(),
+      };
+      io.to('user_' + booking.ground.owner.toString()).emit('bookingUpdated', advPayload);
+      io.to('user_' + booking.player._id?.toString()).emit('bookingUpdated', advPayload);
     }
 
     logger.info(`Advance paid | booking:${bookingId} | val_id:${val_id}`);
@@ -250,7 +256,13 @@ const handleSuccess = async (body, io) => {
       await push(io, booking.ground.owner, 'payment_success', 'Full Payment Received',
         `${booking.player?.name || 'A player'} paid ৳${paidAmount} for ${booking.groundName}.`,
         { bookingId: booking._id });
-      io.to('user_' + booking.ground.owner.toString()).emit('bookingUpdated', booking);
+      const fullPayload = {
+        bookingId: booking._id.toString(),
+        status:    booking.status,
+        groundId:  booking.ground._id?.toString() || booking.ground.toString(),
+      };
+      io.to('user_' + booking.ground.owner.toString()).emit('bookingUpdated', fullPayload);
+      io.to('user_' + booking.player._id?.toString()).emit('bookingUpdated', fullPayload);
     }
 
     logger.info(`Full payment received | booking:${bookingId} | val_id:${val_id}`);

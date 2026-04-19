@@ -59,25 +59,35 @@ app.set('io', io);
 setInterval(async () => {
   try {
     const Booking = require('./models/Booking');
-    const Ground = require('./models/Ground');
-    const expired = await Booking.find({
+    const Ground  = require('./models/Ground');
+    // Fetch expired pending_payment bookings
+    const expiredIds = await Booking.find({
       status: 'pending_payment',
       paymentExpiresAt: { $lt: new Date() }
-    });
-    for (const b of expired) {
-      b.status = 'cancelled';
-      b.cancelReason = 'Payment timeout (5 mins)';
-      b.cancelledBy = 'system';
-      await b.save();
+    }).select('_id player ground');
 
-      const payload = { bookingId: b._id.toString(), status: b.status, groundId: b.ground.toString() };
+    for (const b of expiredIds) {
+      // Use findOneAndUpdate to bypass pre('save') anti-double-booking guard
+      await Booking.findOneAndUpdate(
+        { _id: b._id, status: 'pending_payment' },
+        { $set: { status: 'cancelled', cancelReason: 'Payment timeout (5 mins)', cancelledBy: 'system' } }
+      );
+
+      const groundId = b.ground.toString();
+      const payload  = { bookingId: b._id.toString(), status: 'cancelled', groundId };
+
+      // Notify player
       io.to(`user_${b.player}`).emit('bookingUpdated', payload);
-      
+      window?.dispatchEvent?.(new CustomEvent('pp-booking-updated', { detail: payload }));
+
+      // Notify owner
       const ground = await Ground.findById(b.ground).select('owner');
-      if (ground) io.to(`user_${ground.owner}`).emit('bookingUpdated', payload);
+      if (ground?.owner) io.to(`user_${ground.owner}`).emit('bookingUpdated', payload);
+
+      logger.info(`Payment timeout: cancelled booking ${b._id}`);
     }
   } catch (err) {
-    logger.error('Error in interval booking cleanup', err);
+    logger.error('Error in interval booking cleanup: ' + err.message);
   }
 }, 30000);
 

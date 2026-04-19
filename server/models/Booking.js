@@ -106,11 +106,18 @@ const bookingSchema = new mongoose.Schema({
 // ── Anti double-booking guard ─────────────────────────
 bookingSchema.pre('save', async function (next) {
   if (!this.isNew) return next();
+  const now = new Date();
   const clash = await this.constructor.findOne({
-    ground: this.ground,
-    date:   this.date,
-    status: { $in: ['pending_payment', 'pending', 'confirmed'] },
-    $or: [{ startHour: { $lt: this.endHour }, endHour: { $gt: this.startHour } }],
+    ground:    this.ground,
+    date:      this.date,
+    startHour: { $lt: this.endHour },
+    endHour:   { $gt: this.startHour },
+    $or: [
+      // committed slots always block
+      { status: { $in: ['pending', 'confirmed'] } },
+      // payment-pending slots only block if the 5-min window hasn't expired
+      { status: 'pending_payment', paymentExpiresAt: { $gt: now } },
+    ],
   });
   if (clash) return next(new Error('SLOT_TAKEN'));
   next();

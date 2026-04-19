@@ -43,7 +43,12 @@ const createBooking = async (playerId, playerName, body, io) => {
   const advRequired       = advConf?.enabled && safeMode !== 'sslcommerz';
 
   const initPaymentStatus = safeMode === 'sslcommerz' ? 'pending' : 'unpaid';
+  // pending_payment applies to: full gateway payment OR advance-required at-venue
   const initStatus        = (safeMode === 'sslcommerz' || advRequired) ? 'pending_payment' : 'pending';
+  // 5-minute lock: any booking that starts in 'pending_payment' gets an expiry timestamp.
+  // For SSL gateway payments, the player should complete within 5 mins.
+  // For advance-required at-venue, the advance payment window is also 5 mins.
+  const PAYMENT_TIMEOUT_MS = 5 * 60 * 1000;
 
   const booking = await Booking.create({
     player:        playerId,
@@ -64,7 +69,7 @@ const createBooking = async (playerId, playerName, body, io) => {
       amount:   advConf.amount,
       status:   advRequired ? 'pending' : 'not_required',
     } : { required: false, status: 'not_required' },
-    ...(initStatus === 'pending_payment' ? { paymentExpiresAt: new Date(Date.now() + 5 * 60 * 1000) } : {}),
+    ...(initStatus === 'pending_payment' ? { paymentExpiresAt: new Date(Date.now() + PAYMENT_TIMEOUT_MS) } : {}),
   });
 
   const advNote = advRequired ? ' (advance payment pending)' : '';
