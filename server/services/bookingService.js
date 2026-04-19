@@ -229,6 +229,7 @@ const updateBookingStatus = async (bookingId, ownerId, { status: toStatus, reaso
   // Only succeeds if status is STILL what we just read (prevents race condition).
   const updateFields = {
     status: toStatus,
+    ...(toStatus === 'completed' && { paymentStatus: 'paid' }),
     ...(toStatus === 'cancelled' && {
       cancelledBy:   'owner',
       cancelReason:  reason || 'Cancelled by owner',
