@@ -47,8 +47,8 @@ const createBooking = async (playerId, playerName, body, io) => {
   const initStatus        = (safeMode === 'sslcommerz' || advRequired) ? 'pending_payment' : 'pending';
   // 5-minute lock: any booking that starts in 'pending_payment' gets an expiry timestamp.
   // For SSL gateway payments, the player should complete within 5 mins.
-  // For advance-required at-venue, the advance payment window is also 5 mins.
-  const PAYMENT_TIMEOUT_MS = 5 * 60 * 1000;
+  // For advance-required at-venue, the advance payment window is also 2 mins.
+  const PAYMENT_TIMEOUT_MS = 2 * 60 * 1000;
 
   const booking = await Booking.create({
     player:        playerId,
