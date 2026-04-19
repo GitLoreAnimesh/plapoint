@@ -4,7 +4,7 @@ import { groundAPI, IMAGE_BASE_URL } from '../services/api';
 import { C, SYNE, Spinner, SPORT_EMOJI } from '../components/ui';
 
 const SPORTS = ['badminton','futsal','basketball','tennis','volleyball'];
-const CITIES  = ['Mumbai','Delhi','Bangalore','Hyderabad','Chennai','Pune','Kolkata','Ahmedabad'];
+const CITIES  = ['Dhaka','Chittagong','Sylhet','Rajshahi','Khulna','Barisal','Rangpur','Comilla','Mymensingh'];
 
 function GroundCard({ g }) {
   const img = g.images?.[0];

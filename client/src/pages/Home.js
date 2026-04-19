@@ -16,7 +16,7 @@ export default function HomePage() {
       {/* Hero */}
       <section style={{ padding:'80px 24px 60px', maxWidth:900, margin:'0 auto', textAlign:'center' }}>
         <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(200,245,0,.08)', border:'1px solid rgba(200,245,0,.2)', borderRadius:100, padding:'5px 16px', marginBottom:24, fontSize:12, color:C.lime, fontWeight:600 }}>
-          🏟️ INDIA'S SPORTS BOOKING PLATFORM
+          🏟️ BANGLADESH'S SPORTS BOOKING PLATFORM
         </div>
         <h1 style={{ fontFamily:SYNE, fontSize:'clamp(36px, 6vw, 64px)', fontWeight:800, lineHeight:1.1, margin:'0 0 20px', letterSpacing:-1 }}>
           Book Indoor Sports<br /><span style={{ color:C.lime }}>Facilities Near You</span>
