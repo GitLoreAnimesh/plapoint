@@ -12,7 +12,10 @@ const connectSocket = (userId, onNotification, onBookingUpdated) => {
   socketInstance = io(SOCKET_URL, { withCredentials: true, transports: ['websocket', 'polling'] });
   socketInstance.on('connect', () => { socketInstance.emit('join', userId); });
   socketInstance.on('notification',   (notif)   => { if (onNotification)    onNotification(notif); });
-  socketInstance.on('bookingUpdated', (payload) => { if (onBookingUpdated)  onBookingUpdated(payload); });
+  socketInstance.on('bookingUpdated', (payload) => {
+    window.dispatchEvent(new CustomEvent('pp-booking-updated', { detail: payload }));
+    if (onBookingUpdated) onBookingUpdated(payload);
+  });
 };
 
 const disconnectSocket = () => {
@@ -22,9 +25,9 @@ const disconnectSocket = () => {
 // Allow components to subscribe/unsubscribe to socket events directly.
 // This is safer than re-initialising the socket per component mount.
 export const subscribeToBookingUpdates = (handler) => {
-  if (!socketInstance) return () => {};
-  socketInstance.on('bookingUpdated', handler);
-  return () => socketInstance.off('bookingUpdated', handler);
+  const listener = (e) => handler(e.detail);
+  window.addEventListener('pp-booking-updated', listener);
+  return () => window.removeEventListener('pp-booking-updated', listener);
 };
 
 const useAuth = create(
