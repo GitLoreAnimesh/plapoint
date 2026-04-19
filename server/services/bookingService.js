@@ -64,6 +64,7 @@ const createBooking = async (playerId, playerName, body, io) => {
       amount:   advConf.amount,
       status:   advRequired ? 'pending' : 'not_required',
     } : { required: false, status: 'not_required' },
+    ...(initStatus === 'pending_payment' ? { paymentExpiresAt: new Date(Date.now() + 5 * 60 * 1000) } : {}),
   });
 
   const advNote = advRequired ? ' (advance payment pending)' : '';

@@ -7,11 +7,10 @@ const VALID_TRANSITIONS = {
   owner: {
     pending_payment: ['cancelled'],
     pending:         ['confirmed', 'cancelled'],
-    confirmed:       ['completed', 'cancelled', 'no_show'],
+    confirmed:       ['completed', 'cancelled'],
     // terminal states — no transitions allowed
     completed:       [],
     cancelled:       [],
-    no_show:         [],
   },
   player: {
     pending_payment: ['cancelled'],
@@ -19,7 +18,6 @@ const VALID_TRANSITIONS = {
     confirmed:       ['cancelled'],
     completed:       [],
     cancelled:       [],
-    no_show:         [],
   },
   system: {
     pending_payment: ['pending', 'cancelled'],
@@ -27,7 +25,6 @@ const VALID_TRANSITIONS = {
     confirmed:       ['completed'],
     completed:       [],
     cancelled:       [],
-    no_show:         [],
   },
 };
 
@@ -75,9 +72,10 @@ const bookingSchema = new mongoose.Schema({
   // ── Booking status ────────────────────────────────────
   status: {
     type: String,
-    enum: ['pending_payment', 'pending', 'confirmed', 'cancelled', 'completed', 'no_show'],
-    default: 'pending',
+    enum: ['pending_payment', 'pending', 'confirmed', 'cancelled', 'completed'],
+    default: 'pending_payment',
   },
+  paymentExpiresAt: { type: Date },
   cancelledBy:  { type: String, default: '' },
   cancelReason: { type: String, default: '' },
 

@@ -33,8 +33,11 @@ const getAvailability = async (groundId, date) => {
   const booked = await Booking.find({
     ground: groundId,
     date:   d,
-    status: { $in: ['pending', 'confirmed'] },
-  }).select('startHour endHour');
+    $or: [
+      { status: { $in: ['pending', 'confirmed'] } },
+      { status: 'pending_payment', paymentExpiresAt: { $gt: new Date() } }
+    ]
+  }).select('startHour endHour status paymentExpiresAt');
   return booked;
 };
 

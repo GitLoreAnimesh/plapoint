@@ -55,6 +55,32 @@ io.on('connection', (socket) => {
 });
 app.set('io', io);
 
+// ── Background Tasks ──────────────────────────────────
+setInterval(async () => {
+  try {
+    const Booking = require('./models/Booking');
+    const Ground = require('./models/Ground');
+    const expired = await Booking.find({
+      status: 'pending_payment',
+      paymentExpiresAt: { $lt: new Date() }
+    });
+    for (const b of expired) {
+      b.status = 'cancelled';
+      b.cancelReason = 'Payment timeout (5 mins)';
+      b.cancelledBy = 'system';
+      await b.save();
+
+      const payload = { bookingId: b._id.toString(), status: b.status, groundId: b.ground.toString() };
+      io.to(`user_${b.player}`).emit('bookingUpdated', payload);
+      
+      const ground = await Ground.findById(b.ground).select('owner');
+      if (ground) io.to(`user_${ground.owner}`).emit('bookingUpdated', payload);
+    }
+  } catch (err) {
+    logger.error('Error in interval booking cleanup', err);
+  }
+}, 30000);
+
 // ── Static uploads ────────────────────────────────────
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

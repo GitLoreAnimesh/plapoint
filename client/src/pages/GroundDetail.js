@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { groundAPI, bookingAPI, paymentAPI, IMAGE_BASE_URL } from '../services/api';
-import useAuth from '../store/authStore';
+import useAuth, { subscribeToBookingUpdates } from '../store/authStore';
 import { C, SYNE, MONO, Spinner, Alert, Btn, Modal, SPORT_EMOJI } from '../components/ui';
 
 // ── Slot Grid ─────────────────────────────────────────
@@ -13,11 +13,22 @@ function SlotGrid({ ground, date, onBook }) {
 
   useEffect(() => {
     if (!date) return;
+    
+    const fetchAvail = () => {
+      groundAPI.getAvailability(ground._id, date)
+        .then(r => setBooked(r.data.booked || []))
+        .catch(() => {});
+    };
+
     setLoading(true); setSelected(null);
-    groundAPI.getAvailability(ground._id, date)
-      .then(r => setBooked(r.data.booked || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    fetchAvail();
+    setLoading(false);
+
+    // Completely refetch slots live if anyone triggers event
+    const unsub = subscribeToBookingUpdates((payload) => {
+      if (payload.groundId === ground._id) fetchAvail();
+    });
+    return () => unsub();
   }, [date, ground._id]);
 
   const slots = ground.slots?.length > 0
@@ -27,7 +38,7 @@ function SlotGrid({ ground, date, onBook }) {
         endHour: ground.openHour + i + 1, price: ground.pricePerHour,
       }));
 
-  const isBooked = (s) => booked.some(b => b.startHour < s.endHour && b.endHour > s.startHour);
+  const getSlotBooking = (s) => booked.find(b => b.startHour < s.endHour && b.endHour > s.startHour);
   const isPast   = (s) => {
     const d = new Date(date), now = new Date();
     if (d.toDateString() !== now.toDateString()) return d < now;
@@ -45,25 +56,53 @@ function SlotGrid({ ground, date, onBook }) {
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(120px,1fr))', gap: 7 }}>
         {slots.map(s => {
-          const taken = isBooked(s), past = isPast(s);
+          const bookingRecord = getSlotBooking(s);
+          const past = isPast(s);
+          const isUnderPayment = bookingRecord?.status === 'pending_payment';
+          const taken = !!bookingRecord && !isUnderPayment;
+          const blocked = taken || past || isUnderPayment;
           const isSel = selected?.startHour === s.startHour && selected?.endHour === s.endHour;
+
+          // Compute styles
+          let borderColor = isSel ? C.lime : C.border;
+          let bgColor = 'rgba(255,255,255,.02)';
+          let textColor = C.text;
+          let bottomText = '৳' + s.price;
+          let bottomColor = C.muted;
+
+          if (taken) {
+            borderColor = 'transparent';
+            bgColor = 'rgba(239,68,68,.07)';
+            textColor = '#EF4444';
+            bottomText = 'Booked';
+            bottomColor = '#EF4444';
+          } else if (isUnderPayment) {
+            borderColor = 'transparent';
+            bgColor = 'rgba(245,158,11,.08)';
+            textColor = '#F59E0B';
+            bottomText = 'Locked';
+            bottomColor = '#F59E0B';
+          } else if (past) {
+            textColor = C.border;
+            bottomText = 'Past';
+          } else if (isSel) {
+            bgColor = 'rgba(200,245,0,.1)';
+            textColor = C.lime;
+            bottomColor = C.lime;
+          }
+
           return (
-            <button key={s._id} disabled={taken || past} onClick={() => setSelected(isSel ? null : s)} style={{
-              padding: '9px 6px', borderRadius: 8,
-              border: '1.5px solid ' + (isSel ? C.lime : taken ? 'transparent' : C.border),
-              background: taken ? 'rgba(239,68,68,.07)' : isSel ? 'rgba(200,245,0,.1)' : 'rgba(255,255,255,.02)',
-              color: taken ? '#EF4444' : past ? C.border : isSel ? C.lime : C.text,
-              cursor: (taken || past) ? 'default' : 'pointer', opacity: past ? .35 : 1, transition: 'all .12s',
+            <button key={s._id} disabled={blocked} onClick={() => setSelected(isSel ? null : s)} title={isUnderPayment ? "Another player is currently paying for this slot" : ""} style={{
+              padding: '9px 6px', borderRadius: 8, border: '1.5px solid ' + borderColor, background: bgColor, color: textColor,
+              cursor: blocked ? 'default' : 'pointer', opacity: past ? .35 : 1, transition: 'all .12s',
             }}>
               <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 3 }}>{fmt(s.startHour)} – {fmt(s.endHour)}</div>
-              <div style={{ fontSize: 11, fontFamily: MONO, color: taken ? '#EF4444' : isSel ? C.lime : C.muted }}>
-                {taken ? 'Booked' : past ? 'Past' : '৳' + s.price}
-              </div>
+              <div style={{ fontSize: 11, fontFamily: MONO, color: bottomColor }}>{bottomText}</div>
             </button>
           );
         })}
       </div>
-      {selected && !isBooked(selected) && (
+      {selected && !getSlotBooking(selected) && (
         <div style={{ marginTop: 14, padding: 14, background: 'rgba(200,245,0,.06)', border: '1px solid rgba(200,245,0,.2)', borderRadius: 10 }}>
           <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 3 }}>{fmt(selected.startHour)} – {fmt(selected.endHour)}</div>
           <div style={{ fontFamily: MONO, color: C.lime, fontSize: 20, fontWeight: 700, marginBottom: 12 }}>৳{selected.price}</div>
