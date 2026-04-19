@@ -1,0 +1,103 @@
+/* ── Global Styles ────────────────────────────────────── */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #0D0D0D;
+  color: #F3F4F6;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ── Custom Scrollbar ───────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0D0D0D; 
+}
+::-webkit-scrollbar-thumb {
+  background: #242424; 
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333; 
+}
+
+/* ── Premium Buttons ────────────────────────────────── */
+.btn-premium {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-premium:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(200, 245, 0, 0.2);
+}
+
+.btn-premium:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-premium.variant-danger:hover:not(:disabled) {
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.btn-premium.variant-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ── Glassmorphism Cards ────────────────────────────── */
+.card-glass {
+  background: rgba(26, 26, 26, 0.4) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.3s ease;
+}
+
+.card-glass:hover {
+  background: rgba(26, 26, 26, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Glowing Badges ─────────────────────────────────── */
+.badge-glow {
+  position: relative;
+}
+
+.badge-glow.status-confirmed, .badge-glow.status-completed {
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.4), 0 0 10px rgba(34, 197, 94, 0.2);
+}
+
+.badge-glow.status-pending, .badge-glow.status-pending_payment {
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.4), 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.badge-glow.status-cancelled {
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.4), 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+/* ── Minimal Inputs ─────────────────────────────────── */
+.input-minimal {
+  transition: all 0.2s ease;
+}
+
+.input-minimal:focus {
+  border-color: #C8F500 !important;
+  box-shadow: 0 0 0 3px rgba(200, 245, 0, 0.15);
+}
+
+/* ── Animations ─────────────────────────────────────── */
+@keyframes fadeInSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeInSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

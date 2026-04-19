@@ -98,8 +98,8 @@ export default function BookingsPage() {
         </div>
       ) : (
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-          {bookings.map(b => (
-            <div key={b._id} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:20 }}>
+          {bookings.map((b, i) => (
+            <div key={b._id} className="card-glass animate-fade-in" style={{ animationDelay: `${i * 0.05}s`, borderRadius:12, padding:20 }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:12 }}>
                 <div style={{ flex:1 }}>
                   <div style={{ fontFamily:SYNE, fontWeight:700, fontSize:16, marginBottom:4 }}>{b.groundName}</div>

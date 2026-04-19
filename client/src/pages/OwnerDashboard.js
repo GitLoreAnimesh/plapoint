@@ -179,8 +179,8 @@ function BookingsManager() {
             <table style={{ width:'100%', borderCollapse:'collapse' }}>
               <thead><tr>{['Player','Ground','Date','Slot','Amount','Pay Mode','Advance','Status','Actions'].map(h=><th key={h} style={{ padding:'10px 14px', textAlign:'left', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:.5, color:C.muted, background:C.card }}>{h}</th>)}</tr></thead>
               <tbody>
-                {bookings.map(b=>(
-                  <tr key={b._id} style={{ borderTop:`1px solid ${C.border}`, opacity: processing===b._id ? 0.5 : 1, transition:'opacity .15s' }}>
+                {bookings.map((b, i)=>(
+                  <tr key={b._id} className="animate-fade-in" style={{ animationDelay: `${i * 0.03}s`, borderTop:`1px solid ${C.border}`, opacity: processing===b._id ? 0.5 : 1, transition:'opacity .15s' }}>
                     <td style={{ padding:'12px 14px', fontSize:13 }}>
                       <div style={{ fontWeight:600 }}>{b.player?.name}</div>
                       <div style={{ fontSize:11, color:C.muted }}>{b.player?.phone||b.player?.email}</div>

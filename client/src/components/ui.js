@@ -34,7 +34,7 @@ export const SANS = "'DM Sans', sans-serif";
 export function Badge({ status }) {
   const cfg = STATUS_CFG[status] || { color: C.muted, bg: 'rgba(107,114,128,.12)', label: status };
   return (
-    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 10px', borderRadius:100, fontSize:11, fontWeight:700, color:cfg.color, background:cfg.bg, textTransform:'capitalize', fontFamily:SANS }}>
+    <span className={`badge-glow status-${status}`} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 10px', borderRadius:100, fontSize:11, fontWeight:700, color:cfg.color, background:cfg.bg, textTransform:'capitalize', fontFamily:SANS }}>
       <span style={{ width:5, height:5, borderRadius:'50%', background:cfg.color, display:'inline-block' }} />
       {cfg.label}
     </span>
@@ -51,7 +51,7 @@ export function Btn({ children, variant='primary', size='md', onClick, disabled,
     success:  { background:'rgba(34,197,94,.1)',  color:C.green, border:`1px solid rgba(34,197,94,.3)` },
   };
   const sizes = { sm:{ padding:'5px 12px', fontSize:12 }, md:{ padding:'8px 18px', fontSize:13 }, lg:{ padding:'12px 28px', fontSize:15 } };
-  return <button type={type} onClick={onClick} disabled={disabled} style={{ ...base, ...variants[variant], ...sizes[size], ...style }}>{children}</button>;
+  return <button type={type} onClick={onClick} disabled={disabled} className={`btn-premium variant-${variant}`} style={{ ...base, ...variants[variant], ...sizes[size], ...style }}>{children}</button>;
 }
 
 // ── Input ───────────────────────────────────────────────
@@ -59,7 +59,7 @@ export function Input({ label, error, ...props }) {
   return (
     <div style={{ marginBottom:16 }}>
       {label && <label style={{ display:'block', fontSize:12, fontWeight:600, color:C.muted, marginBottom:6, textTransform:'uppercase', letterSpacing:.5 }}>{label}</label>}
-      <input style={{ width:'100%', padding:'10px 14px', background:C.surface, border:`1px solid ${error?C.red:C.border}`, borderRadius:8, color:C.text, fontSize:14, fontFamily:SANS, outline:'none', boxSizing:'border-box' }} {...props} />
+      <input className="input-minimal" style={{ width:'100%', padding:'10px 14px', background:C.surface, border:`1px solid ${error?C.red:C.border}`, borderRadius:8, color:C.text, fontSize:14, fontFamily:SANS, outline:'none', boxSizing:'border-box' }} {...props} />
       {error && <span style={{ fontSize:11, color:C.red, marginTop:4, display:'block' }}>{error}</span>}
     </div>
   );
@@ -70,14 +70,14 @@ export function Select({ label, children, ...props }) {
   return (
     <div style={{ marginBottom:16 }}>
       {label && <label style={{ display:'block', fontSize:12, fontWeight:600, color:C.muted, marginBottom:6, textTransform:'uppercase', letterSpacing:.5 }}>{label}</label>}
-      <select style={{ width:'100%', padding:'10px 14px', background:C.surface, border:`1px solid ${C.border}`, borderRadius:8, color:C.text, fontSize:14, fontFamily:SANS, outline:'none', boxSizing:'border-box' }} {...props}>{children}</select>
+      <select className="input-minimal" style={{ width:'100%', padding:'10px 14px', background:C.surface, border:`1px solid ${C.border}`, borderRadius:8, color:C.text, fontSize:14, fontFamily:SANS, outline:'none', boxSizing:'border-box' }} {...props}>{children}</select>
     </div>
   );
 }
 
 // ── Card ────────────────────────────────────────────────
 export function Card({ children, style={}, onClick }) {
-  return <div onClick={onClick} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:20, ...style }}>{children}</div>;
+  return <div onClick={onClick} className="card-glass" style={{ borderRadius:12, padding:20, ...style }}>{children}</div>;
 }
 
 // ── Alert ───────────────────────────────────────────────
