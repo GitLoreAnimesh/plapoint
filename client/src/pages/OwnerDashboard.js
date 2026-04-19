@@ -247,6 +247,8 @@ function MyGrounds() {
   const [advForm, setAdvForm] = useState({ enabled:false, amount:'', instructions:'' });
   const [imgModal, setImgModal] = useState(null); // ground for image management
   const [delConfirm, setDelConfirm] = useState(null); // ground to delete
+  const [editModal, setEditModal] = useState(null);
+  const [editForm, setEditForm] = useState({ openHour:'', closeHour:'', pricePerHour:'', description:'' });
 
   const load = () => {
     ownerAPI.getGrounds().then(r=>{setGrounds(r.data.grounds||[]);setLoading(false);}).catch(()=>setLoading(false));
@@ -276,6 +278,23 @@ function MyGrounds() {
       await groundAPI.updateSlots(slotModal._id, slots.map(s=>({ startHour:s.startHour, endHour:s.endHour, price:+s.price, label:s.label||`${s.startHour}:00 – ${s.endHour}:00`, isBlocked:s.isBlocked||false })));
       setMsg('✅ Slots saved!'); setSlotModal(null); load();
     } catch (err) { setMsg(err.response?.data?.error||'Failed.'); }
+  };
+
+  const openEdit = (g) => {
+    setEditModal(g);
+    setEditForm({ openHour:g.openHour||6, closeHour:g.closeHour||23, pricePerHour:g.pricePerHour||'', description:g.description||'' });
+  };
+
+  const saveEdit = async () => {
+    try {
+      const fd = new FormData();
+      fd.append('openHour', editForm.openHour);
+      fd.append('closeHour', editForm.closeHour);
+      fd.append('pricePerHour', editForm.pricePerHour);
+      fd.append('description', editForm.description);
+      await groundAPI.update(editModal._id, fd);
+      setMsg('✅ Details updated!'); setEditModal(null); load();
+    } catch (err) { setMsg(err.response?.data?.error||'Failed to update.'); }
   };
 
   const removeImage = async (groundId, imageUrl) => {
@@ -347,6 +366,7 @@ function MyGrounds() {
                   <span style={{ fontSize:11, padding:'3px 10px', borderRadius:100, background:g.isApproved?'rgba(34,197,94,.1)':'rgba(245,158,11,.1)', color:g.isApproved?C.green:'#F59E0B', fontWeight:700 }}>
                     {g.isApproved ? '● Live' : '⏳ Pending Approval'}
                   </span>
+                  <Btn size="sm" variant="ghost" onClick={() => openEdit(g)}>📝 Edit Details</Btn>
                   <Btn size="sm" variant="ghost" onClick={() => openSlots(g)}>Manage Slots</Btn>
                   <Btn size="sm" variant={g.advancePayment?.enabled ? 'success' : 'ghost'} onClick={() => openAdv(g)}>
                     {g.advancePayment?.enabled ? `Adv. ৳${g.advancePayment.amount}` : 'Adv. Pay: OFF'}
@@ -510,6 +530,48 @@ function MyGrounds() {
             <div style={{ display:'flex', gap:10, marginTop:16 }}>
               <Btn onClick={saveSlots} style={{ flex:1 }}>Save Slots</Btn>
               <Btn variant="ghost" onClick={()=>setSlotModal(null)}>Cancel</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── Edit Details Modal ──────────────────────────── */}
+      {editModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:20 }}>
+          <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:28, width:'100%', maxWidth:500, display:'flex', flexDirection:'column' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+              <h3 style={{ margin:0, fontFamily:SYNE, fontSize:18 }}>Edit Details — {editModal.name}</h3>
+              <button onClick={()=>setEditModal(null)} style={{ background:'none', border:'none', color:C.muted, fontSize:22, cursor:'pointer' }}>×</button>
+            </div>
+            <p style={{ fontSize:13, color:C.muted, marginBottom:20, marginTop:0 }}>Update the core parameters of your ground which will be public to all players.</p>
+            
+            <div style={{ display:'flex', gap:12, marginBottom:16 }}>
+              <div style={{ flex:1 }}>
+                <label style={{ display:'block', fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase', letterSpacing:.5, marginBottom:5 }}>Open Hour (0-24)</label>
+                <input type="number" value={editForm.openHour} onChange={e=>setEditForm({...editForm, openHour:e.target.value})} 
+                       style={{ width:'100%', padding:'9px 14px', background:'#141414', border:'1px solid '+C.border, borderRadius:8, color:C.text, fontSize:14, outline:'none', boxSizing:'border-box', fontFamily:"'Space Mono',monospace" }} />
+              </div>
+              <div style={{ flex:1 }}>
+                <label style={{ display:'block', fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase', letterSpacing:.5, marginBottom:5 }}>Close Hour (0-24)</label>
+                <input type="number" value={editForm.closeHour} onChange={e=>setEditForm({...editForm, closeHour:e.target.value})} 
+                       style={{ width:'100%', padding:'9px 14px', background:'#141414', border:'1px solid '+C.border, borderRadius:8, color:C.text, fontSize:14, outline:'none', boxSizing:'border-box', fontFamily:"'Space Mono',monospace" }} />
+              </div>
+            </div>
+            
+            <div style={{ marginBottom:16 }}>
+              <label style={{ display:'block', fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase', letterSpacing:.5, marginBottom:5 }}>Default Price Per Hour (৳)</label>
+              <input type="number" value={editForm.pricePerHour} onChange={e=>setEditForm({...editForm, pricePerHour:e.target.value})} 
+                     style={{ width:'100%', padding:'9px 14px', background:'#141414', border:'1px solid '+C.border, borderRadius:8, color:C.text, fontSize:14, outline:'none', boxSizing:'border-box', fontFamily:"'Space Mono',monospace" }} />
+            </div>
+
+            <div style={{ marginBottom:20 }}>
+              <label style={{ display:'block', fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase', letterSpacing:.5, marginBottom:5 }}>Description / Tagline</label>
+              <textarea value={editForm.description} onChange={e=>setEditForm({...editForm, description:e.target.value})} placeholder="e.g. Premium turf starting from ৳500/hr!" rows={3} 
+                        style={{ width:'100%', padding:'9px 12px', background:'#141414', border:'1px solid '+C.border, borderRadius:8, color:C.text, fontSize:13, outline:'none', boxSizing:'border-box', resize:'vertical', fontFamily:"'DM Sans',sans-serif" }} />
+            </div>
+
+            <div style={{ display:'flex', gap:10 }}>
+              <button onClick={saveEdit} style={{ flex:1, padding:'10px', background:C.lime, color:'#0D0D0D', border:'none', borderRadius:8, fontWeight:700, cursor:'pointer', fontSize:13, fontFamily:"'DM Sans',sans-serif" }}>Save Details</button>
+              <button onClick={()=>setEditModal(null)} style={{ padding:'10px 18px', background:'transparent', border:'1px solid '+C.border, borderRadius:8, color:C.muted, cursor:'pointer', fontSize:13, fontFamily:"'DM Sans',sans-serif" }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -28,7 +28,8 @@ function GroundCard({ g }) {
         {/* Info */}
         <div style={{ padding:'14px 16px' }}>
           <div style={{ fontFamily:SYNE, fontWeight:700, fontSize:16, marginBottom:4 }}>{g.name}</div>
-          <div style={{ color:'#6B7280', fontSize:12, marginBottom:12 }}>📍 {g.area ? `${g.area}, ` : ''}{g.city}</div>
+          <div style={{ color:'#6B7280', fontSize:12, marginBottom:10 }}>📍 {g.area ? `${g.area}, ` : ''}{g.city}</div>
+          {g.description && <div style={{ fontSize:12, color:C.text, marginBottom:12, opacity:0.85, lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, windowBoxOrient:'vertical', WebkitBoxOrient:'vertical', overflow:'hidden' }}>{g.description}</div>}
           {g.amenities?.length > 0 && (
             <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:12 }}>
               {g.amenities.slice(0,3).map(a => (
