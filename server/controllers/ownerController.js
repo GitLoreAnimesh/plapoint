@@ -19,11 +19,11 @@ exports.getDashboard = asyncHandler(async (req, res) => {
       .populate('player', 'name phone email')
       .sort({ startHour: 1 }),
     Booking.aggregate([
-      { $match: { ground: { $in: groundIds }, status: { $in: ['confirmed','completed'] }, createdAt: { $gte: weekAgo } } },
+      { $match: { ground: { $in: groundIds }, status: 'completed', createdAt: { $gte: weekAgo } } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
     ]),
     Booking.aggregate([
-      { $match: { ground: { $in: groundIds }, status: { $in: ['confirmed','completed'] }, createdAt: { $gte: monthAgo } } },
+      { $match: { ground: { $in: groundIds }, status: 'completed', createdAt: { $gte: monthAgo } } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
     ]),
   ]);
@@ -74,11 +74,11 @@ exports.getAnalytics = asyncHandler(async (req, res) => {
   const year   = new Date().getFullYear();
   const [monthly, bySport] = await Promise.all([
     Booking.aggregate([
-      { $match: { ground: { $in: groundIds }, status: { $in: ['confirmed','completed'] }, date: { $gte: new Date(`${year}-01-01`) } } },
+      { $match: { ground: { $in: groundIds }, status: 'completed', date: { $gte: new Date(`${year}-01-01`) } } },
       { $group: { _id: { $month: '$date' }, revenue: { $sum: '$amount' }, count: { $sum: 1 } } },
     ]),
     Booking.aggregate([
-      { $match: { ground: { $in: groundIds }, status: { $in: ['confirmed','completed'] } } },
+      { $match: { ground: { $in: groundIds }, status: 'completed' } },
       { $group: { _id: '$sport', revenue: { $sum: '$amount' }, count: { $sum: 1 } } },
     ]),
   ]);
