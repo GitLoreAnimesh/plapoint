@@ -50,7 +50,7 @@ export default function BookingsPage() {
         const idx = prev.findIndex(b => b._id === payload.bookingId);
         if (idx === -1) return prev;
         const updated = [...prev];
-        updated[idx] = { ...updated[idx], status: payload.status };
+        updated[idx] = { ...updated[idx], status: payload.status, cancelledBy: payload.cancelledBy };
         // Remove from list if we're filtered and status no longer matches
         if (tabRef.current !== 'all' && payload.status !== tabRef.current) {
           updated.splice(idx, 1);
@@ -59,7 +59,8 @@ export default function BookingsPage() {
       });
       // Show a toast so the player knows something changed
       if (payload.status === 'confirmed') toast.success('Your booking has been confirmed by the owner!');
-      if (payload.status === 'cancelled') toast.error('Your booking was cancelled by the owner.');
+      if (payload.status === 'cancelled' && payload.cancelledBy === 'owner') toast.error('Your booking was cancelled by the owner.');
+      if (payload.status === 'cancelled' && payload.cancelledBy === 'system') toast.error('Your booking expired due to timeout.');
     });
     return unsubscribe;
   }, []); // eslint-disable-line

@@ -11,9 +11,10 @@ const logger               = require('../utils/logger');
 const emitBookingUpdate = (io, booking, groundOwnerId) => {
   if (!io) return;
   const payload = {
-    bookingId: booking._id.toString(),
-    status:    booking.status,
-    groundId:  booking.ground?._id?.toString() || booking.ground?.toString(),
+    bookingId:   booking._id.toString(),
+    status:      booking.status,
+    groundId:    booking.ground?._id?.toString() || booking.ground?.toString(),
+    cancelledBy: booking.cancelledBy,
   };
   // Notify the owner's socket room
   io.to(`user_${groundOwnerId}`).emit('bookingUpdated', payload);
