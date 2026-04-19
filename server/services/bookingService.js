@@ -92,7 +92,7 @@ const getPlayerBookings = async (playerId, { status } = {}) => {
   if (status) filter.status = status;
   return Booking.find(filter)
     .populate({ path: 'ground', select: 'name city sport images address advancePayment', populate: { path: 'owner', select: 'name email phone' } })
-    .sort({ date: -1 });
+    .sort({ createdAt: -1 });
 };
 
 // ─────────────────────────────────────────────────────
