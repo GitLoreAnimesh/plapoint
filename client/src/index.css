@@ -91,7 +91,7 @@ html, body {
 }
 
 .animate-fade-in {
-  animation: fadeInSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fadeInSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes kenBurns {
