@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { C, SYNE } from '../components/ui';
+import BicycleKickAnimation from '../components/BicycleKickAnimation';
 
 const SPORTS = [
   { icon:'🏸', name:'Badminton', color:'#C8F500' },
@@ -17,17 +18,7 @@ export default function HomePage() {
       <section style={{ position: 'relative', padding:'120px 24px 100px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'75vh', textAlign:'center', borderBottom:`1px solid ${C.border}`, marginBottom: 60 }}>
         
         {/* Animated Premium Background */}
-        <div className="premium-bg-container">
-          <img src="/bicycle-kick.png" alt="Bicycle Kick Goal" className="premium-bg-image" />
-          <div className="premium-hero-overlay"></div>
-          
-          {/* Animated Particles */}
-          <div className="particle" style={{ left: '15%', animationDuration: '8s', animationDelay: '0s' }}></div>
-          <div className="particle" style={{ left: '35%', animationDuration: '12s', animationDelay: '2s' }}></div>
-          <div className="particle" style={{ left: '55%', animationDuration: '9s', animationDelay: '5s' }}></div>
-          <div className="particle" style={{ left: '75%', animationDuration: '14s', animationDelay: '1s' }}></div>
-          <div className="particle" style={{ left: '90%', animationDuration: '10s', animationDelay: '4s' }}></div>
-        </div>
+        <BicycleKickAnimation />
 
         <div style={{ position: 'relative', zIndex: 10, maxWidth: 900, width: '100%', margin: '0 auto', animation: 'fadeInSlideUp 0.8s ease-out' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(200,245,0,.15)', border:'1px solid rgba(200,245,0,.3)', borderRadius:100, padding:'6px 20px', marginBottom:28, fontSize:13, color:C.lime, fontWeight:700, letterSpacing:1 }}>
