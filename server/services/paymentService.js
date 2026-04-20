@@ -17,9 +17,7 @@ const apiBase     = () => {
 const generateTranId = (bookingId, prefix = 'PP') =>
   `${prefix}-${bookingId}-${Date.now()}`;
 
-// ─────────────────────────────────────────────────────────
-// initiatePayment — full booking amount
-// ─────────────────────────────────────────────────────────
+
 const initiatePayment = async (bookingId, player) => {
   const booking = await Booking.findById(bookingId).populate('ground', 'name city');
   if (!booking)
@@ -56,7 +54,7 @@ const initiatePayment = async (bookingId, player) => {
     value_a:          bookingId.toString(),
     value_b:          player._id.toString(),
     value_c:          cb,
-    value_d:          'full',           // type flag: full payment
+    value_d:          'full',       
   };
 
   const sslcz = new SSLCommerzPayment(storeId, storePasswd, isLive);
@@ -87,9 +85,6 @@ const initiatePayment = async (bookingId, player) => {
   return { gatewayUrl: apiResponse.GatewayPageURL, tranId };
 };
 
-// ─────────────────────────────────────────────────────────
-// initiateAdvancePayment — advance amount only
-// ─────────────────────────────────────────────────────────
 const initiateAdvancePayment = async (bookingId, player) => {
   const booking = await Booking.findById(bookingId).populate('ground', 'name city advancePayment');
   if (!booking)
@@ -130,7 +125,7 @@ const initiateAdvancePayment = async (bookingId, player) => {
     value_a:          bookingId.toString(),
     value_b:          player._id.toString(),
     value_c:          cb,
-    value_d:          'advance',        // type flag: advance payment
+    value_d:          'advance',        
   };
 
   const sslcz = new SSLCommerzPayment(storeId, storePasswd, isLive);
@@ -158,9 +153,7 @@ const initiateAdvancePayment = async (bookingId, player) => {
   return { gatewayUrl: apiResponse.GatewayPageURL, tranId };
 };
 
-// ─────────────────────────────────────────────────────────
-// handleSuccess — browser redirect after payment
-// ─────────────────────────────────────────────────────────
+
 const handleSuccess = async (body, io) => {
   const {
     val_id, tran_id, amount, bank_tran_id, card_type,
@@ -172,7 +165,6 @@ const handleSuccess = async (body, io) => {
   const booking = await Booking.findById(bookingId).populate('ground', 'name city owner').populate('player', 'name');
   if (!booking) throw new AppError('Booking not found.', 404);
 
-  // Validate with SSLCommerz
   const sslcz = new SSLCommerzPayment(storeId, storePasswd, isLive);
   let validation;
   try {
@@ -195,7 +187,6 @@ const handleSuccess = async (body, io) => {
   const paidAmount = parseFloat(amount);
 
   if (payType === 'advance') {
-    // ── Advance payment confirmed ──
     if (booking.advancePayment.status === 'paid') return { booking, cb: cb || clientBase() };
 
     booking.advancePayment.status   = 'paid';
@@ -227,10 +218,8 @@ const handleSuccess = async (body, io) => {
     return { booking, cb: cb || clientBase(), payType: 'advance' };
 
   } else {
-    // ── Full payment confirmed ──
     if (booking.paymentStatus === 'paid') return { booking, cb: cb || clientBase() };
 
-    // Amount check (allow ±1 BDT tolerance)
     if (Math.abs(paidAmount - booking.amount) > 1) {
       logger.error(`Amount mismatch | booking:${bookingId} | expected:${booking.amount} | got:${paidAmount}`);
       booking.paymentStatus = 'failed';
@@ -239,7 +228,7 @@ const handleSuccess = async (body, io) => {
     }
 
     booking.paymentStatus         = 'paid';
-    booking.status                = 'pending'; // paid — awaiting owner confirmation
+    booking.status                = 'pending'; 
     booking.sslPayment.valId      = val_id      || '';
     booking.sslPayment.bankTranId = bank_tran_id || '';
     booking.sslPayment.cardType   = card_type   || '';
@@ -270,9 +259,7 @@ const handleSuccess = async (body, io) => {
   }
 };
 
-// ─────────────────────────────────────────────────────────
-// handleFail
-// ─────────────────────────────────────────────────────────
+
 const handleFail = async (body) => {
   const { tran_id, value_a: bookingId, value_c: cb, value_d: payType } = body;
   if (!bookingId) return { cb: cb || clientBase() };
@@ -298,9 +285,6 @@ const handleFail = async (body) => {
   return { cb: cb || clientBase() };
 };
 
-// ─────────────────────────────────────────────────────────
-// handleCancel
-// ─────────────────────────────────────────────────────────
 const handleCancel = async (body) => {
   const { tran_id, value_a: bookingId, value_c: cb, value_d: payType } = body;
   if (!bookingId) return { cb: cb || clientBase() };
@@ -326,9 +310,7 @@ const handleCancel = async (body) => {
   return { cb: cb || clientBase() };
 };
 
-// ─────────────────────────────────────────────────────────
-// handleIPN — server-to-server, must respond 200 fast
-// ─────────────────────────────────────────────────────────
+
 const handleIPN = async (body, io) => {
   const { status, value_a: bookingId } = body;
   if (!bookingId) return;

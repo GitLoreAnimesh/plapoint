@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const opts = { abortEarly: false, stripUnknown: true };
 
-// ── Auth ──────────────────────────────────────────────
+// Auth 
 const registerSchema = Joi.object({
   name:     Joi.string().trim().min(2).max(60).required(),
   email:    Joi.string().email().lowercase().required(),
@@ -17,7 +17,7 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-// ── Grounds ───────────────────────────────────────────
+//  Grounds 
 const groundSchema = Joi.object({
   name:          Joi.string().trim().min(2).max(100).required(),
   description:   Joi.string().allow('').max(1000).default(''),
@@ -37,7 +37,7 @@ const advPaymentSchema = Joi.object({
   instructions: Joi.string().allow('').max(500).default(''),
 });
 
-// ── Bookings ──────────────────────────────────────────
+//  Bookings
 const bookingSchema = Joi.object({
   groundId:    Joi.string().required(),
   date:        Joi.string().isoDate().required(),
@@ -51,7 +51,7 @@ const reviewSchema = Joi.object({
   comment: Joi.string().allow('').max(500).default(''),
 });
 
-// ── Middleware factory ────────────────────────────────
+//  Middleware factory 
 const validate = (schema, source = 'body') => (req, res, next) => {
   const { error, value } = schema.validate(req[source], opts);
   if (error) {

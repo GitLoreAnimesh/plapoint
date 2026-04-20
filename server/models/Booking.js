@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 
-// ── Valid state machine transitions ───────────────────
-// Defines what status an owner/player/system is allowed to move TO from each current status.
-// This is the single source of truth for all transition rules.
+
 const VALID_TRANSITIONS = {
   owner: {
     pending_payment: ['cancelled'],
     pending:         ['confirmed', 'cancelled'],
     confirmed:       ['completed', 'cancelled'],
-    // terminal states — no transitions allowed
+    
     completed:       [],
     cancelled:       [],
   },
@@ -43,7 +41,7 @@ const bookingSchema = new mongoose.Schema({
   city:          { type: String, default: '' },
   amount:        { type: Number, required: true },
 
-  // ── Payment ───────────────────────────────────────────
+  //Payment
   paymentMode: {
     type: String,
     enum: ['pay_at_venue', 'sslcommerz'],
@@ -69,7 +67,7 @@ const bookingSchema = new mongoose.Schema({
     ipnRaw:         { type: Object },
   },
 
-  // ── Booking status ────────────────────────────────────
+  // Booking status
   status: {
     type: String,
     enum: ['pending_payment', 'pending', 'confirmed', 'cancelled', 'completed'],
@@ -79,11 +77,10 @@ const bookingSchema = new mongoose.Schema({
   cancelledBy:  { type: String, default: '' },
   cancelReason: { type: String, default: '' },
 
-  // ── Optimistic concurrency — increment on every write ─
-  // Prevents two simultaneous requests from both succeeding on stale data.
+
   __v: { type: Number, default: 0 },
 
-  // ── Advance payment (via SSLCommerz) ──────────────────
+  //Advance payment 
   advancePayment: {
     required:  { type: Boolean, default: false },
     amount:    { type: Number, default: 0 },
@@ -95,7 +92,7 @@ const bookingSchema = new mongoose.Schema({
     ipnRaw:    { type: Object },
   },
 
-  // ── Review ────────────────────────────────────────────
+  //Review
   review: {
     rating:    Number,
     comment:   String,
@@ -103,7 +100,7 @@ const bookingSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-// ── Anti double-booking guard ─────────────────────────
+//Anti double-booking guard 
 bookingSchema.pre('save', async function (next) {
   if (!this.isNew) return next();
   const now = new Date();

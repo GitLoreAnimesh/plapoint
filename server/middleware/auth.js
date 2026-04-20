@@ -12,11 +12,7 @@ const COOKIE_OPTS = {
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
 };
 
-/**
- * sendTokens — issues access + refresh tokens.
- * Access token goes in JSON body (frontend stores in memory).
- * Refresh token goes in HttpOnly cookie only.
- */
+
 const sendTokens = (user, statusCode, res) => {
   const accessToken  = signAccess(user._id);
   const refreshToken = signRefresh(user._id);
@@ -38,7 +34,7 @@ const sendTokens = (user, statusCode, res) => {
   res.status(statusCode).json({ success: true, accessToken, user: safeUser });
 };
 
-// ── protect ───────────────────────────────────────────
+// protect
 const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -58,7 +54,7 @@ const protect = async (req, res, next) => {
   }
 };
 
-// ── role guard ────────────────────────────────────────
+//role guard
 const role = (...roles) => (req, res, next) => {
   if (!req.user || !roles.includes(req.user.role)) {
     return res.status(403).json({ error: 'Access denied.' });

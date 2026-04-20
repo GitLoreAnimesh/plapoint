@@ -16,13 +16,13 @@ module.exports = (err, req, res, next) => {
     statusCode = 422;
   }
 
-  // Mongoose cast error (invalid ObjectId)
+  // Mongoose cast error 
   if (err.name === 'CastError') {
     message = `Invalid ${err.path}.`;
     statusCode = 400;
   }
 
-  // JWT errors
+  
   if (err.name === 'JsonWebTokenError')  { message = 'Invalid token.';          statusCode = 401; }
   if (err.name === 'TokenExpiredError')  { message = 'TOKEN_EXPIRED';           statusCode = 401; }
 

@@ -12,15 +12,13 @@ export default function Navbar() {
   const [menuOpen,   setMenuOpen]   = useState(false);
   const notifRef = useRef(null);
 
-  // Fetch persisted notifications once on login
   useEffect(() => {
     if (!user) return;
     notifAPI.get()
       .then(r => setNotifications(r.data.notifications || []))
       .catch(() => {});
-  }, [user?._id]); // eslint-disable-line
+  }, [user?._id]); 
 
-  // Close dropdowns on click outside
   useEffect(() => {
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
@@ -31,7 +29,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Close menu on route change
   useEffect(() => { setMenuOpen(false); setShowNotifs(false); }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -78,7 +75,6 @@ export default function Navbar() {
       padding: '0 24px', height: 60,
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     }}>
-      {/* Logo */}
       <Link to="/" style={{ fontFamily: SYNE, fontWeight: 800, fontSize: 20, color: C.lime, textDecoration: 'none', letterSpacing: -0.5 }}>
         PLAY<span style={{ color: C.text }}>POINT</span>
       </Link>

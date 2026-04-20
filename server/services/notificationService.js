@@ -1,9 +1,5 @@
 const Notification = require('../models/Notification');
 
-/**
- * Creates a notification in DB and emits via Socket.IO.
- * io is optional — if not present, only DB record is created.
- */
 const push = async (io, recipientId, type, title, message, data = {}) => {
   const notification = await Notification.create({ recipient: recipientId, type, title, message, data });
   io?.to(`user_${recipientId}`).emit('notification', notification);

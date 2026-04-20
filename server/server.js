@@ -14,8 +14,7 @@ const logger       = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
-// ── Setup ──────────────────────────────────────────────
-// Sanitize CLIENT_URL — handle single OR multiple comma-separated URLs
+
 const CLIENT_URL = (process.env.CLIENT_URL || 'http://localhost:3000')
   .split(',')
   .map(url => url.trim().replace(/^["']|["']$/g, ''))
@@ -27,12 +26,10 @@ const io     = new Server(server, {
   cors: { origin: CLIENT_URL, credentials: true },
 });
 
-// Ensure directories exist
 ['logs', path.join(__dirname, 'uploads')].forEach(dir => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// ── Middleware ─────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
   origin:      CLIENT_URL,
@@ -46,7 +43,6 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
   stream: { write: (msg) => logger.info(msg.trim()) },
 }));
 
-// ── Socket.IO ─────────────────────────────────────────
 io.on('connection', (socket) => {
   socket.on('join', (userId) => {
     socket.join(`user_${userId}`);
@@ -70,7 +66,7 @@ setInterval(async () => {
       // Use findOneAndUpdate to bypass pre('save') anti-double-booking guard
       await Booking.findOneAndUpdate(
         { _id: b._id, status: 'pending_payment' },
-        { $set: { status: 'cancelled', cancelReason: 'Payment timeout (5 mins)', cancelledBy: 'system' } }
+        { $set: { status: 'cancelled', cancelReason: 'Payment timeout (time limit expired)', cancelledBy: 'system' } }
       );
 
       const groundId = b.ground.toString();

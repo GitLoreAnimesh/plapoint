@@ -5,7 +5,7 @@ import { groundAPI, bookingAPI, paymentAPI, IMAGE_BASE_URL } from '../services/a
 import useAuth, { subscribeToBookingUpdates } from '../store/authStore';
 import { C, SYNE, MONO, Spinner, Alert, Btn, Modal, SPORT_EMOJI } from '../components/ui';
 
-// ── Slot Grid ─────────────────────────────────────────
+// ── Slot Grid 
 function SlotGrid({ ground, date, onBook }) {
   const [booked,   setBooked]   = useState([]);
   const [selected, setSelected] = useState(null);
@@ -113,7 +113,7 @@ function SlotGrid({ ground, date, onBook }) {
   );
 }
 
-// ── Gateway Redirect Overlay ──────────────────────────
+// ── Gateway Redirect Overlay 
 function PaymentRedirectOverlay() {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(13,13,13,.97)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
@@ -128,7 +128,7 @@ function PaymentRedirectOverlay() {
   );
 }
 
-// ── Main Page ─────────────────────────────────────────
+// ── Main Page 
 export default function GroundDetailPage() {
   const { id }               = useParams();
   const { user }             = useAuth();
@@ -141,7 +141,6 @@ export default function GroundDetailPage() {
   const [imgIdx,   setImgIdx]   = useState(0);
 
   const [bookModal,   setBookModal]   = useState(null);
-  // Removed payMode state as flow is strictly defined by adv.enabled
   const [submitting,  setSubmitting]  = useState(false);
   const [bookError,   setBookError]   = useState('');
   const [redirecting, setRedirecting] = useState(false);
@@ -168,8 +167,7 @@ export default function GroundDetailPage() {
     } else if (paymentResult === 'cancelled') {
       toast('Payment cancelled.', { icon: 'ℹ️' });
     }
-  }, []); // eslint-disable-line
-
+  }, []);
   const today = new Date().toISOString().split('T')[0];
   const adv   = ground?.advancePayment;
   const owner = ground?.owner;
@@ -188,11 +186,9 @@ export default function GroundDetailPage() {
       const booking = res.data.booking;
 
       if (adv?.enabled) {
-        // pay_at_venue but advance required — redirect player to pay advance
         setBookModal(null);
         setSubmitting(false);
         toast('Booking created! Please pay the advance to confirm your slot.', { icon: '⚡' });
-        // Redirect to advance payment
         try {
           setRedirecting(true);
           const payRes = await paymentAPI.initiateAdvance(booking._id);
@@ -305,7 +301,7 @@ export default function GroundDetailPage() {
           )}
         </div>
 
-        {/* ── RIGHT — Booking Panel ─────────────────────── */}
+        {/* ── RIGHT — Booking Panel */}
         <div style={{ background: C.card, border: '1px solid ' + C.border, borderRadius: 14, padding: 22, position: 'sticky', top: 80 }}>
           <div style={{ fontFamily: SYNE, fontWeight: 700, fontSize: 17, marginBottom: 18 }}>Book a Slot</div>
 
@@ -317,7 +313,6 @@ export default function GroundDetailPage() {
               style={{ width: '100%', padding: '10px 14px', background: '#fff', border: '1px solid ' + C.border, borderRadius: 8, color: '#111', fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: 'none', boxSizing: 'border-box', cursor: 'pointer' }} />
           </div>
 
-          {/* Payment Method UI removed. It strictly relies on advancePayment.enabled */}
 
           {/* Slots */}
           <div>
@@ -333,7 +328,7 @@ export default function GroundDetailPage() {
         </div>
       </div>
 
-      {/* ── BOOKING MODAL ──────────────────────────────── */}
+      {/* ── BOOKING MODAL*/}
       {bookModal && (
         <Modal title="Confirm Booking" onClose={() => { setBookModal(null); setBookError(''); }}>
           {bookError && <Alert type="error" onClose={() => setBookError('')}>{bookError}</Alert>}
@@ -356,8 +351,6 @@ export default function GroundDetailPage() {
             <span style={{ fontSize: 12, color: C.muted }}>Total  </span>
             <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: C.lime }}>৳{bookModal.price}</span>
           </div>
-
-          {/* Gateway info banner removed */}
 
           {/* Advance payment info */}
           {adv?.enabled && (

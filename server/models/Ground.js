@@ -30,11 +30,11 @@ const groundSchema = new mongoose.Schema({
     type:        { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number], default: [0, 0] },
   },
-  // Advance payment configuration — collected via payment gateway
+  
   advancePayment: {
     enabled:      { type: Boolean, default: false },
-    amount:       { type: Number, default: 0 },     // fixed amount in BDT
-    instructions: { type: String, default: '' },    // custom note to player
+    amount:       { type: Number, default: 0 },     
+    instructions: { type: String, default: '' },   
   },
 }, { timestamps: true });
 

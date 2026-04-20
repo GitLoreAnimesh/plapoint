@@ -3,7 +3,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { adminAPI } from '../services/api';
 import { C, SYNE, MONO, Badge, Btn, Spinner, Alert } from '../components/ui';
 
-// ── Sidebar ────────────────────────────────────────────
+// ── Sidebar 
 function Sidebar() {
   const loc = useLocation();
   const links = [
@@ -28,7 +28,7 @@ function Sidebar() {
   );
 }
 
-// ── KPI ────────────────────────────────────────────────
+// ── KPI 
 function KPI({ label, value, color, icon }) {
   return (
     <div style={{ background:'#111', border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
@@ -38,7 +38,7 @@ function KPI({ label, value, color, icon }) {
   );
 }
 
-// ── Overview ───────────────────────────────────────────
+// ── Overview 
 function Overview() {
   const [stats, setStats] = useState(null);
   useEffect(() => { adminAPI.getStats().then(r=>setStats(r.data.stats)).catch(()=>{}); }, []);
@@ -67,7 +67,7 @@ function Overview() {
   );
 }
 
-// ── Owners Panel ───────────────────────────────────────
+// ── Owners Panel
 function OwnersPanel() {
   const [owners, setOwners] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +139,7 @@ function OwnersPanel() {
   );
 }
 
-// ── Grounds Panel ──────────────────────────────────────
+// ── Grounds Panel 
 function GroundsPanel() {
   const [grounds, setGrounds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,7 +197,7 @@ function GroundsPanel() {
   );
 }
 
-// ── Players Panel ──────────────────────────────────────
+// ── Players Panel 
 function PlayersPanel() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -255,7 +255,7 @@ function PlayersPanel() {
   );
 }
 
-// ── Bookings Monitor ───────────────────────────────────
+// ── Bookings Monitor 
 function BookingsMonitor() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -318,7 +318,7 @@ function BookingsMonitor() {
   );
 }
 
-// ── Main ───────────────────────────────────────────────
+// ── Main
 export default function AdminDashboard() {
   return (
     <div style={{ display:'flex', background:C.bg, color:C.text, minHeight:'calc(100vh - 60px)' }}>

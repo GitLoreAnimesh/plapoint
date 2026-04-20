@@ -14,23 +14,39 @@ export default function HomePage() {
   return (
     <div style={{ background:C.bg, minHeight:'100vh' }}>
       {/* Hero */}
-      <section style={{ padding:'80px 24px 60px', maxWidth:900, margin:'0 auto', textAlign:'center' }}>
-        <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(200,245,0,.08)', border:'1px solid rgba(200,245,0,.2)', borderRadius:100, padding:'5px 16px', marginBottom:24, fontSize:12, color:C.lime, fontWeight:600 }}>
-          🏟️ BANGLADESH'S SPORTS BOOKING PLATFORM
+      <section style={{ position: 'relative', padding:'120px 24px 100px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'75vh', textAlign:'center', borderBottom:`1px solid ${C.border}`, marginBottom: 60 }}>
+        
+        {/* Animated Premium Background */}
+        <div className="premium-bg-container">
+          <img src="/bicycle-kick.png" alt="Bicycle Kick Goal" className="premium-bg-image" />
+          <div className="premium-hero-overlay"></div>
+          
+          {/* Animated Particles */}
+          <div className="particle" style={{ left: '15%', animationDuration: '8s', animationDelay: '0s' }}></div>
+          <div className="particle" style={{ left: '35%', animationDuration: '12s', animationDelay: '2s' }}></div>
+          <div className="particle" style={{ left: '55%', animationDuration: '9s', animationDelay: '5s' }}></div>
+          <div className="particle" style={{ left: '75%', animationDuration: '14s', animationDelay: '1s' }}></div>
+          <div className="particle" style={{ left: '90%', animationDuration: '10s', animationDelay: '4s' }}></div>
         </div>
-        <h1 style={{ fontFamily:SYNE, fontSize:'clamp(36px, 6vw, 64px)', fontWeight:800, lineHeight:1.1, margin:'0 0 20px', letterSpacing:-1 }}>
-          Book Indoor Sports<br /><span style={{ color:C.lime }}>Facilities Near You</span>
-        </h1>
-        <p style={{ fontSize:18, color:'#9CA3AF', marginBottom:36, maxWidth:520, margin:'0 auto 36px', lineHeight:1.6 }}>
-          Find and book badminton courts, futsal arenas, basketball courts and more. Instant confirmation, no calls needed.
-        </p>
-        <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-          <Link to="/grounds" style={{ padding:'14px 32px', background:C.lime, color:'#0D0D0D', borderRadius:10, fontWeight:800, textDecoration:'none', fontSize:16, fontFamily:SYNE }}>
-            Find Grounds →
-          </Link>
-          <Link to="/register" style={{ padding:'14px 32px', background:'transparent', color:C.text, border:`1px solid ${C.border}`, borderRadius:10, fontWeight:600, textDecoration:'none', fontSize:15 }}>
-            List Your Facility
-          </Link>
+
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: 900, width: '100%', margin: '0 auto', animation: 'fadeInSlideUp 0.8s ease-out' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(200,245,0,.15)', border:'1px solid rgba(200,245,0,.3)', borderRadius:100, padding:'6px 20px', marginBottom:28, fontSize:13, color:C.lime, fontWeight:700, letterSpacing:1 }}>
+            🏟️ BANGLADESH'S SPORTS BOOKING PLATFORM
+          </div>
+          <h1 style={{ fontFamily:SYNE, fontSize:'clamp(42px, 7vw, 76px)', fontWeight:800, lineHeight:1.05, margin:'0 0 24px', letterSpacing:-1.5, textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}>
+            Book Indoor Sports<br /><span style={{ color:C.lime }}>Facilities Near You</span>
+          </h1>
+          <p style={{ fontSize:20, color:'#D1D5DB', marginBottom:40, maxWidth:580, margin:'0 auto 40px', lineHeight:1.6, textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+            Find and book badminton courts, futsal arenas, basketball courts and more. Instant confirmation, no calls needed.
+          </p>
+          <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+            <Link to="/grounds" className="btn-premium" style={{ padding:'16px 36px', background:C.lime, color:'#0D0D0D', borderRadius:12, fontWeight:800, textDecoration:'none', fontSize:16, fontFamily:SYNE, boxShadow: '0 8px 25px rgba(200,245,0,0.25)' }}>
+              Find Grounds →
+            </Link>
+            <Link to="/register" className="card-glass" style={{ padding:'16px 36px', color:'#FFF', border:`1px solid rgba(255,255,255,0.2)`, borderRadius:12, fontWeight:700, textDecoration:'none', fontSize:16 }}>
+              List Your Facility
+            </Link>
+          </div>
         </div>
       </section>
 

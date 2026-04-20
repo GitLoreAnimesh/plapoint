@@ -15,10 +15,7 @@ exports.initiate = asyncHandler(async (req, res) => {
   res.json({ success: true, ...result });
 });
 
-/**
- * POST /api/payment/initiate-advance
- * Player initiates advance payment via SSLCommerz.
- */
+
 exports.initiateAdvance = asyncHandler(async (req, res) => {
   const { bookingId } = req.body;
   if (!bookingId) throw new AppError('bookingId is required.', 400);
@@ -26,10 +23,7 @@ exports.initiateAdvance = asyncHandler(async (req, res) => {
   res.json({ success: true, ...result });
 });
 
-/**
- * POST /api/payment/ssl/success
- * SSLCommerz browser redirect after successful payment.
- */
+
 exports.sslSuccess = asyncHandler(async (req, res) => {
   try {
     const { booking, cb, payType } = await paymentService.handleSuccess(req.body, req.app.get('io'));
@@ -42,26 +36,19 @@ exports.sslSuccess = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * POST /api/payment/ssl/fail
- */
+
 exports.sslFail = asyncHandler(async (req, res) => {
   const { cb } = await paymentService.handleFail(req.body);
   res.redirect(`${cb}/bookings?payment=failed`);
 });
 
-/**
- * POST /api/payment/ssl/cancel
- */
+
 exports.sslCancel = asyncHandler(async (req, res) => {
   const { cb } = await paymentService.handleCancel(req.body);
   res.redirect(`${cb}/bookings?payment=cancelled`);
 });
 
-/**
- * POST /api/payment/ssl/ipn
- * Server-to-server IPN — respond 200 immediately.
- */
+
 exports.sslIPN = asyncHandler(async (req, res) => {
   res.status(200).json({ received: true });
   paymentService.handleIPN(req.body, req.app.get('io')).catch(err =>
@@ -69,9 +56,7 @@ exports.sslIPN = asyncHandler(async (req, res) => {
   );
 });
 
-/**
- * GET /api/payment/status/:bookingId
- */
+
 exports.getStatus = asyncHandler(async (req, res) => {
   const Booking = require('../models/Booking');
   const b = await Booking.findById(req.params.bookingId)

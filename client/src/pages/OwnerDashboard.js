@@ -5,7 +5,7 @@ import { C, SYNE, MONO, Badge, Btn, Spinner, Alert } from '../components/ui';
 import useAuth, { subscribeToBookingUpdates } from '../store/authStore';
 import toast from 'react-hot-toast';
 
-// ── Sidebar ────────────────────────────────────────────
+// ── Sidebar 
 function Sidebar({ isApproved }) {
   const loc = useLocation();
   const links = [
@@ -29,7 +29,7 @@ function Sidebar({ isApproved }) {
   );
 }
 
-// ── KPI Card ───────────────────────────────────────────
+// ── KPI Card
 function KPI({ label, value, sub, mono }) {
   return (
     <div style={{ background:'#111', border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
@@ -40,7 +40,7 @@ function KPI({ label, value, sub, mono }) {
   );
 }
 
-// ── Overview ───────────────────────────────────────────
+// ── Overview
 function Overview() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -87,13 +87,13 @@ function Overview() {
   );
 }
 
-// ── Bookings Manager ───────────────────────────────────
+// ── Bookings Manager 
 function BookingsManager() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
-  const [processing, setProcessing] = useState(null); // bookingId currently being acted on
+  const [processing, setProcessing] = useState(null); 
   const filterRef = React.useRef('');
   const dateFilterRef = React.useRef('');
 
@@ -114,24 +114,24 @@ function BookingsManager() {
       setBookings(prev => {
         const idx = prev.findIndex(b => b._id === payload.bookingId);
         if (idx === -1) {
-          // New booking appeared for this owner (e.g. just created) — refetch
+
           load(filterRef.current, dateFilterRef.current);
           return prev;
         }
         const updated = [...prev];
         updated[idx] = { ...updated[idx], status: payload.status };
-        // If we're filtered and the new status doesn't match, remove it
+        
         if (filterRef.current && payload.status !== filterRef.current) {
           updated.splice(idx, 1);
         }
         return updated;
       });
     });
-    return unsubscribe; // cleanup on unmount
-  }, []); // eslint-disable-line
+    return unsubscribe; 
+  }, []); 
 
   const update = async (id, toStatus, reason='') => {
-    // Optimistic: disable buttons immediately so owner can't double-click
+
     setProcessing(id);
     try {
       const res = await ownerAPI.updateBooking(id, { status: toStatus, reason });
@@ -236,7 +236,7 @@ function BookingsManager() {
   );
 }
 
-// ── My Grounds ─────────────────────────────────────────
+// ── My Grounds
 function MyGrounds() {
   const [grounds, setGrounds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -400,7 +400,7 @@ function MyGrounds() {
         </div>
       )}
 
-      {/* ── Delete Confirmation Modal ─────────────────── */}
+      {/* ── Delete Confirmation Modal*/}
       {delConfirm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.85)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:20 }}>
           <div style={{ background:C.card, border:`1px solid #EF4444`, borderRadius:16, padding:28, width:'100%', maxWidth:400, textAlign:'center' }}>
@@ -418,7 +418,7 @@ function MyGrounds() {
         </div>
       )}
 
-      {/* ── Image Management Modal ────────────────────── */}
+      {/* ── Image Management Modal */}
       {imgModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.85)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:20 }}>
           <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:28, width:'100%', maxWidth:560, maxHeight:'85vh', display:'flex', flexDirection:'column' }}>
@@ -459,7 +459,7 @@ function MyGrounds() {
         </div>
       )}
 
-      {/* ── Advance Payment Settings Modal ───────────── */}
+      {/* ── Advance Payment Settings Modal*/}
       {advModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.82)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:20 }}>
           <div style={{ background:C.card, border:'1px solid '+C.border, borderRadius:16, padding:28, width:'100%', maxWidth:460 }}>
@@ -502,7 +502,7 @@ function MyGrounds() {
         </div>
       )}
 
-      {/* ── Slot manager modal ────────────────────────── */}
+      {/* ── Slot manager modal*/}
       {slotModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:20 }}>
           <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:28, width:'100%', maxWidth:560, maxHeight:'85vh', display:'flex', flexDirection:'column' }}>
@@ -534,7 +534,7 @@ function MyGrounds() {
           </div>
         </div>
       )}
-      {/* ── Edit Details Modal ──────────────────────────── */}
+      {/* ── Edit Details Modal*/}
       {editModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.8)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:20 }}>
           <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:28, width:'100%', maxWidth:500, display:'flex', flexDirection:'column' }}>
@@ -580,7 +580,7 @@ function MyGrounds() {
   );
 }
 
-// ── Add Ground ─────────────────────────────────────────
+// ── Add Ground 
 function AddGround() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name:'', sport:'badminton', city:'', area:'', address:'', description:'', pricePerHour:'', amenities:[], openHour:'6', closeHour:'23', lat:'', lng:'' });
@@ -670,7 +670,7 @@ function AddGround() {
   );
 }
 
-// ── Analytics ──────────────────────────────────────────
+// ── Analytics 
 function Analytics() {
   const [data, setData] = useState(null);
   useEffect(() => { ownerAPI.getAnalytics().then(r=>setData(r.data)).catch(()=>{}); }, []);
@@ -733,7 +733,7 @@ function Analytics() {
   );
 }
 
-// ── Not Approved Banner ────────────────────────────────
+// ── Not Approved Banner 
 function NotApprovedBanner() {
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'80px 24px', textAlign:'center' }}>
@@ -749,7 +749,7 @@ function NotApprovedBanner() {
   );
 }
 
-// ── Main ───────────────────────────────────────────────
+// ── Main 
 export default function OwnerDashboard() {
   const { user } = useAuth();
   const isApproved = user?.isApproved === true;

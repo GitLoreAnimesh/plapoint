@@ -67,7 +67,6 @@ export default function GroundsPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { search(); }, []);
 
 
@@ -99,7 +98,6 @@ export default function GroundsPage() {
         <button onClick={() => { setFilters({ sport:'', city:'', area:'' }); search({ sport:'', city:'', area:'' }); }} style={{ ...inp, cursor:'pointer', color:C.muted }}>Clear</button>
       </div>
 
-      {/* Sport pills */}
       <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:28 }}>
         {['',  ...SPORTS].map(s => (
           <button key={s||'all'} onClick={() => setFilter('sport', s)} style={{ padding:'6px 16px', borderRadius:100, border:`1px solid ${filters.sport===s ? C.lime : C.border}`, background: filters.sport===s ? 'rgba(200,245,0,.07)' : 'transparent', color: filters.sport===s ? C.lime : C.muted, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:"'DM Sans',sans-serif" }}>

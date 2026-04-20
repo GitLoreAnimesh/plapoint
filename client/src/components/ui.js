@@ -25,7 +25,7 @@ export const STATUS_CFG  = {
   completed: { color:'#8B5CF6', bg:'rgba(139,92,246,.12)',  label:'Completed' },
 };
 
-// ── Typography ──────────────────────────────────────────
+// ── Typography
 export const SYNE = "'Syne', sans-serif";
 export const MONO = "'Space Mono', monospace";
 export const SANS = "'DM Sans', sans-serif";

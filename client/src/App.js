@@ -16,7 +16,7 @@ import AdminDashboard from './pages/AdminDashboard';
 
 import { C } from './components/ui';
 
-// ── Protected Route ───────────────────────────────────
+// ── Protected Route 
 function ProtectedRoute({ children, roles }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -24,7 +24,7 @@ function ProtectedRoute({ children, roles }) {
   return children;
 }
 
-// ── Loading screen shown while bootstrap checks auth ──
+// ── Loading screen shown while bootstrap checks auth
 function BootScreen() {
   return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.bg }}>
@@ -38,13 +38,13 @@ function BootScreen() {
 }
 
 export default function App() {
-  const ready = useBootstrap(); // restores session from refresh cookie
+  const ready = useBootstrap(); 
 
   if (!ready) return <BootScreen />;
 
   return (
     <BrowserRouter>
-      {/* Toast notifications — positioned top-right with dark theme */}
+
       <Toaster
         position="top-right"
         toastOptions={{

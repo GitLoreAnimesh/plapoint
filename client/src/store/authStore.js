@@ -22,8 +22,7 @@ const disconnectSocket = () => {
   if (socketInstance) { socketInstance.disconnect(); socketInstance = null; }
 };
 
-// Allow components to subscribe/unsubscribe to socket events directly.
-// This is safer than re-initialising the socket per component mount.
+
 export const subscribeToBookingUpdates = (handler) => {
   const listener = (e) => handler(e.detail);
   window.addEventListener('pp-booking-updated', listener);
@@ -49,7 +48,6 @@ const useAuth = create(
               unreadCount:   state.unreadCount + 1,
             }));
           },
-          // bookingUpdated global handler — components subscribe directly via subscribeToBookingUpdates
           null
         );
       },

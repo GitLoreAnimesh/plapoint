@@ -25,17 +25,15 @@ router.get('/',                    ctrl.search);
 router.get('/:id',                 ctrl.getOne);
 router.get('/:id/availability',    ctrl.getAvailability);
 
-// Owner — create / update
+// Owner
 router.post('/',                   protect, role('owner'), upload.array('images', 8), validate(groundSchema), ctrl.create);
 router.put('/:id',                 protect, role('owner'), upload.array('images', 8), ctrl.update);
 
-// Owner — image management
+
 router.delete('/:id/images',       protect, role('owner'), ctrl.removeImage);
 
-// Owner — delete ground
 router.delete('/:id',              protect, role('owner'), ctrl.deleteGround);
 
-// Owner — slot / advance-payment config
 router.post('/:id/slots',          protect, role('owner'), ctrl.updateSlots);
 router.put('/:id/advance-payment', protect, role('owner'), validate(advPaymentSchema), ctrl.setAdvancePayment);
 
