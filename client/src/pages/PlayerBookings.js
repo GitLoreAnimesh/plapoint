@@ -43,27 +43,29 @@ export default function BookingsPage() {
 
   useEffect(() => { load(tab); }, [tab]);
 
-  // Real-time updates — when owner confirms/cancels, update instantly
   useEffect(() => {
     const unsubscribe = subscribeToBookingUpdates((payload) => {
       setBookings(prev => {
         const idx = prev.findIndex(b => b._id === payload.bookingId);
         if (idx === -1) return prev;
         const updated = [...prev];
-        updated[idx] = { ...updated[idx], status: payload.status, cancelledBy: payload.cancelledBy };
-        // Remove from list if we're filtered and status no longer matches
+        updated[idx] = { 
+          ...updated[idx], 
+          status: payload.status, 
+          cancelledBy: payload.cancelledBy,
+          ...(payload.paymentStatus && { paymentStatus: payload.paymentStatus })
+        };
         if (tabRef.current !== 'all' && payload.status !== tabRef.current) {
           updated.splice(idx, 1);
         }
         return updated;
       });
-      // Show a toast so the player knows something changed
       if (payload.status === 'confirmed') toast.success('Your booking has been confirmed by the owner!');
       if (payload.status === 'cancelled' && payload.cancelledBy === 'owner') toast.error('Your booking was cancelled by the owner.');
       if (payload.status === 'cancelled' && payload.cancelledBy === 'system') toast.error('Your booking expired due to timeout.');
     });
     return unsubscribe;
-  }, []); // eslint-disable-line
+  }, []); 
 
   const cancel = async (id) => {
     const reason = window.prompt('Reason for cancelling (optional):');
@@ -131,14 +133,12 @@ export default function BookingsPage() {
                   <Badge status={b.status} />
                   <div style={{ fontFamily:MONO, fontWeight:700, fontSize:18, color:C.lime }}>৳{b.amount}</div>
                   <div style={{ display:'flex', gap:6, flexWrap:'wrap', justifyContent:'flex-end' }}>
-                    {/* Full gateway payment */}
                     {b.status === 'pending_payment' && b.paymentMode === 'sslcommerz' && b.paymentStatus !== 'paid' && (
                       <Btn size="sm" onClick={() => payNow(b._id)} style={{ background:'#3B82F6', color:'#fff', border:'none' }}>💳 Complete Payment</Btn>
                     )}
                     {b.status === 'pending' && b.paymentMode === 'sslcommerz' && b.paymentStatus === 'paid' && (
                       <span style={{ fontSize:11, color:'#22C55E', fontWeight:700, padding:'3px 8px', borderRadius:5, background:'rgba(34,197,94,.1)', border:'1px solid rgba(34,197,94,.25)' }}>✓ Paid — Awaiting Confirmation</span>
                     )}
-                    {/* Advance payment via gateway */}
                     {b.advancePayment?.required && b.advancePayment.status === 'pending' && (
                       <Btn size="sm" onClick={() => payAdvanceNow(b._id)} style={{ background:'#7C3AED', color:'#fff', border:'none' }}>💳 Pay Advance ৳{b.advancePayment.amount}</Btn>
                     )}
